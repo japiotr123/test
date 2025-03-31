@@ -1,0 +1,18 @@
+# Pliki Visual Studio
+.vs/
+*.suo
+*.user
+*.vcxproj.*
+
+# Wyniki kompilacji
+bin/
+obj/
+*.pdb
+
+# Pliki tymczasowe i ustawienia uzytkownika
+*.cache
+*.log
+*.tmp
+
+# Pliki wrazliwe (poki co takich nie mamy ale moga sie pojawic)
+.env
