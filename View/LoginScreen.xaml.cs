@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Data.SqlClient;
+using PolMedUMG.ViewModel;
 
 namespace PolMedUMG.View
 {
@@ -22,6 +24,7 @@ namespace PolMedUMG.View
         public LoginScreen()
         {
             InitializeComponent();
+            DataContext = new LoginViewModel();
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -47,7 +50,10 @@ namespace PolMedUMG.View
 
         private void btnLog_In(object sender, RoutedEventArgs e)
         {
-
+            if (DataContext is LoginViewModel vm)
+            {
+                vm.Password = passwordInput.Password;
+            }
         }
 
         private void btn_pass_reset(object sender, RoutedEventArgs e)
