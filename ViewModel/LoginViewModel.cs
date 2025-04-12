@@ -4,6 +4,9 @@ using System.Windows;
 using System.Windows.Input;
 using PolMedUMG.Model;
 using PolMedUMG.View;
+using System.IO;
+using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 
 namespace PolMedUMG.ViewModel
 {
@@ -33,36 +36,60 @@ namespace PolMedUMG.ViewModel
 
         private void Login()
         {
-            var correctPatient = new UserModel
-            {
-                Username = "patient",
-                Password = "patient"
-            };
-            var correctDoctor = new UserModel
-            {
-                Username = "doctor",
-                Password = "doctor"
-            };
+            // CONNECTION STRING
+            string dbPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "database.mdf");
+            string connectionString = $@"Server=(LocalDB)\MSSQLLocalDB;AttachDbFilename={dbPath};Integrated Security=True;";
 
-            if (Username == correctPatient.Username && Password == correctPatient.Password )
-            {
-                MessageBox.Show("Zalogowano pomyœlnie do strony pacjenta!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-                PatientScreen patientWindow = new PatientScreen();
-                patientWindow.Show();
-                Application.Current.MainWindow.Close();
-                
-            }
-            else if (Username == correctDoctor.Username && Password == correctDoctor.Password)
-            {
-                MessageBox.Show("Zalogowano pomyœlnie do strony doktora!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-                DoctorScreen doctorWindow = new DoctorScreen();
-                doctorWindow.Show();
-                Application.Current.MainWindow.Close();
+            using (var conn = new SqlConnection(connectionString)) {
+                conn.Open();
+                Console.WriteLine("Connection to the database was successful.");
 
-            }
-            else
-            {
-                MessageBox.Show("B³êdny login lub has³o.", "B³¹d", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                string loginQuery = "SELECT * FROM users WHERE username=@username AND password=@password;";
+
+                using (SqlCommand cmd = new SqlCommand(loginQuery, conn)) {
+                    if(_username.IsNullOrEmpty() || _password.IsNullOrEmpty())
+                    {
+                        MessageBox.Show("Nie podano danych!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+                     
+                    cmd.Parameters.AddWithValue("@username", _username);
+                    cmd.Parameters.AddWithValue("@password", _password);
+                    int numOfRows = 0;
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            numOfRows++;
+                            string accType = reader["accType"].ToString();
+
+                            if (accType == "doktor")
+                            {
+                                DoctorScreen doctorWindow = new DoctorScreen();
+                                doctorWindow.Show();
+                                Application.Current.MainWindow.Close();
+                            }
+
+                            if (accType == "pacjent")
+                            {
+                                PatientScreen patientWindow = new PatientScreen();
+                                patientWindow.Show();
+                                Application.Current.MainWindow.Close();
+                            }
+
+                        }
+
+                        if(numOfRows == 0)
+                        {
+                            MessageBox.Show("B³êdny login lub has³o.", "B³¹d", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            
+            
+            
             }
         }
 

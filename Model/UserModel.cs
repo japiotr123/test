@@ -4,5 +4,6 @@ namespace PolMedUMG.Model
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string AccType { get; set; }
     }
 }
