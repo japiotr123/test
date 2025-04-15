@@ -1,12 +1,15 @@
-using System.ComponentModel;
+ï»¿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using PolMedUMG.Model;
 using PolMedUMG.View;
 using System.IO;
-using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
+using MySqlX.XDevAPI;
+using System.Data.Common;
 
 namespace PolMedUMG.ViewModel
 {
@@ -36,61 +39,73 @@ namespace PolMedUMG.ViewModel
 
         private void Login()
         {
-            // CONNECTION STRING
-            string dbPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "database.mdf");
-            string connectionString = $@"Server=(LocalDB)\MSSQLLocalDB;AttachDbFilename={dbPath};Integrated Security=True;";
+            // Przechowuje informacjï¿½ dotyczï¿½ce poï¿½ï¿½czenia z bazï¿½ danych
+            string connStrSQL = "server=bwpd1lnfwwmd8zooiosa-mysql.services.clever-cloud.com;uid=uf9nqf7gizjdvxmm;pwd=mV5lVFodqkbncFJJnxqQ;database=bwpd1lnfwwmd8zooiosa";
 
-            using (var conn = new SqlConnection(connectionString)) {
+            try
+            {
+                MySql.Data.MySqlClient.MySqlConnection conn = new MySql.Data.MySqlClient.MySqlConnection(connStrSQL);
                 conn.Open();
-                Console.WriteLine("Connection to the database was successful.");
 
-
-                string loginQuery = "SELECT * FROM users WHERE username=@username AND password=@password;";
-
-                using (SqlCommand cmd = new SqlCommand(loginQuery, conn)) {
-                    if(_username.IsNullOrEmpty() || _password.IsNullOrEmpty())
+                // Zapytanie do bazy o wybranego uï¿½ytkownika
+                MySqlCommand query = new MySqlCommand();
+                query.Connection = conn;
+                query.CommandText = @"SELECT COUNT(*) FROM users WHERE uid = @uid AND pwd = @pwd;";
+                query.Parameters.AddWithValue("@uid", _username);
+                query.Parameters.AddWithValue("@pwd", _password);
+                int userCount = (int)(long)query.ExecuteScalar();
+                conn.Close();
+                if (userCount > 0)
+                {
+                    // Istnieje uï¿½ytkownik z takimi danymi
+                    try
                     {
-                        MessageBox.Show("Nie podano danych!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-                        return;
+                        conn.Open();
+                        // Sprawdzamy jakiego typu jest uï¿½ytkownik
+                        MySqlCommand query2 = new MySqlCommand();
+                        query2.Connection = conn;
+                        query2.CommandText = @"SELECT acc_type FROM users WHERE uid = @uid AND pwd = @pwd;";
+                        query2.Parameters.AddWithValue("@uid", _username);
+                        query2.Parameters.AddWithValue("@pwd", _password);
+                        String acctype = query2.ExecuteScalar().ToString();
+                        conn.Close();
+
+                        // W zaleï¿½noï¿½ci od typu uï¿½ytkownika otwieramy odpowiednie okno
+                        if (acctype.Equals("2"))
+                        {
+                            MessageBox.Show("Zalogowano jako admin");
+                        }
+                        else if (acctype.Equals("1"))
+                        {
+                            DoctorScreen doctorWindow = new DoctorScreen();
+                            doctorWindow.Show();
+                            Application.Current.MainWindow.Close();
+                        }
+                        else
+                        {
+                            PatientScreen patientWindow = new PatientScreen();
+                            patientWindow.Show();
+                            Application.Current.MainWindow.Close();
+                        }
+
                     }
-                     
-                    cmd.Parameters.AddWithValue("@username", _username);
-                    cmd.Parameters.AddWithValue("@password", _password);
-                    int numOfRows = 0;
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    catch (MySql.Data.MySqlClient.MySqlException ex)
                     {
-                        while (reader.Read())
-                        {
-                            numOfRows++;
-                            string accType = reader["accType"].ToString();
-
-                            if (accType == "doktor")
-                            {
-                                DoctorScreen doctorWindow = new DoctorScreen();
-                                doctorWindow.Show();
-                                Application.Current.MainWindow.Close();
-                            }
-
-                            if (accType == "pacjent")
-                            {
-                                PatientScreen patientWindow = new PatientScreen();
-                                patientWindow.Show();
-                                Application.Current.MainWindow.Close();
-                            }
-
-                        }
-
-                        if(numOfRows == 0)
-                        {
-                            MessageBox.Show("B³êdny login lub has³o.", "B³¹d", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        MessageBox.Show(ex.Message);
                     }
                 }
-            
-            
-            
+                else
+                {
+                    MessageBox.Show("Niepoprawny login lub hasï¿½o");
+                }
             }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
