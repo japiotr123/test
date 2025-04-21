@@ -1,11 +1,143 @@
-<Window x:Class="PolMedUMG.View.PatientScreen"
+﻿<Window x:Class="PolMedUMG.View.PatientScreen"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LoginScreen" Height="720" Width="1280"
+        Title="Panel pacjenta" Height="720" Width="1280"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
+
     <Grid>
-        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24" Text="Widok Pacjenta" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT SIDEBAR -->
+        <DockPanel Grid.Row="0" Grid.Column="0" Background="White">
+
+            <!-- Logo -->
+            <Image Source="{StaticResource di_PolMedLOGO}"
+                 Height="80"
+                 Margin="10"
+                 DockPanel.Dock="Top"
+                 Stretch="Uniform"/>
+
+            <!-- Navigation List -->
+            <ListBox x:Name="NavList"
+               DockPanel.Dock="Top"
+               Background="Transparent"
+               BorderThickness="0"
+               SelectionMode="Single"
+               Margin="0,10,0,0"
+               SelectedIndex="0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="SnapsToDevicePixels" Value="True"/>
+                        <Setter Property="OverridesDefaultStyle" Value="True"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Border"
+                                        BorderThickness="0,0,0,1"
+                                        BorderBrush="LightGray"
+                                        Background="Transparent"
+                                        Padding="20,16">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="#D3D3D3"/>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="Black"/>
+                                            <Setter TargetName="Border" Property="BorderThickness" Value="4,0,0,1"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Border" Property="Background" Value="#D3D3D3"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <!-- Your menu items -->
+                <ListBoxItem>Strona główna</ListBoxItem>
+                <ListBoxItem>Umów wizytę</ListBoxItem>
+                <ListBoxItem>Kalendarz</ListBoxItem>
+                <ListBoxItem>Historia wizyt</ListBoxItem>
+                <ListBoxItem>Wyniki badań</ListBoxItem>
+                <ListBoxItem>Cennik</ListBoxItem>
+                <ListBoxItem>Specjaliści</ListBoxItem>
+                <ListBoxItem>Wiadomości</ListBoxItem>
+                <ListBoxItem>Kontakt</ListBoxItem>
+                <ListBoxItem>Ustawienia konta</ListBoxItem>
+            </ListBox>
+
+        </DockPanel>
+
+        <!-- RIGHT CONTENT AREA -->
+        <Grid Grid.Row="0" Grid.Column="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="AKTUALNOŚCI"
+                 FontSize="26"
+                 FontWeight="Bold"
+                 HorizontalAlignment="Center"
+                 Margin="0,0,0,20"
+                 Grid.Row="0"/>
+
+            <!-- Mosaic of cards -->
+            <Grid Grid.Row="1" Grid.Column="1">
+                <!-- 3 columns, 3 rows -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- LEFT COLUMN -->
+                <!-- Big tall card spanning rows 0–1 -->
+                <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+                <!-- Small card at bottom-left -->
+                <Border Grid.Row="2" Grid.Column="0" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+
+                <!-- CENTER COLUMN -->
+                <Border Grid.Row="0" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+                <Border Grid.Row="1" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+                <Border Grid.Row="2" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+
+                <!-- RIGHT COLUMN -->
+                <!-- Big tall card spanning rows 0–1 -->
+                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+                <!-- Small card at bottom-right -->
+                <Border Grid.Row="2" Grid.Column="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
+
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
+            <TextBlock Text="Zalogowany jako: "
+                 VerticalAlignment="Center"
+                 FontSize="14"
+                 FontWeight="Bold"
+                 Foreground="White"/>
+        </Border>
     </Grid>
+
 </Window>
