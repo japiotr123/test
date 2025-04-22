@@ -4,6 +4,7 @@
         Title="Panel pacjenta" Height="720" Width="1280"
         WindowStyle="None"
         ResizeMode="NoResize"
+        xmlns:view="clr-namespace:PolMedUMG.View"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -33,7 +34,8 @@
                BorderThickness="0"
                SelectionMode="Single"
                Margin="0,10,0,0"
-               SelectedIndex="0">
+               SelectedIndex="0"
+               SelectionChanged="MyListBox_SelectionChanged">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -45,12 +47,12 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="Border"
-                                        BorderThickness="0,0,0,1"
-                                        BorderBrush="LightGray"
-                                        Background="Transparent"
-                                        Padding="20,16">
+                            BorderThickness="0,0,0,1"
+                            BorderBrush="LightGray"
+                            Background="Transparent"
+                            Padding="20,16">
                                         <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                  VerticalAlignment="Center"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
@@ -84,52 +86,11 @@
         </DockPanel>
 
         <!-- RIGHT CONTENT AREA -->
-        <Grid Grid.Row="0" Grid.Column="1" Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Text="AKTUALNOŚCI"
-                 FontSize="26"
-                 FontWeight="Bold"
-                 HorizontalAlignment="Center"
-                 Margin="0,0,0,20"
-                 Grid.Row="0"/>
-
-            <!-- Mosaic of cards -->
-            <Grid Grid.Row="1" Grid.Column="1">
-                <!-- 3 columns, 3 rows -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- LEFT COLUMN -->
-                <!-- Big tall card spanning rows 0–1 -->
-                <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-                <!-- Small card at bottom-left -->
-                <Border Grid.Row="2" Grid.Column="0" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-
-                <!-- CENTER COLUMN -->
-                <Border Grid.Row="0" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-                <Border Grid.Row="1" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-                <Border Grid.Row="2" Grid.Column="1" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-
-                <!-- RIGHT COLUMN -->
-                <!-- Big tall card spanning rows 0–1 -->
-                <Border Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-                <!-- Small card at bottom-right -->
-                <Border Grid.Row="2" Grid.Column="2" Margin="15" CornerRadius="8" Background="#D3D3D3"/>
-
-            </Grid>
-        </Grid>
+        <DockPanel 
+            x:Name="RightContentPanel"
+            Grid.Row="0" Grid.Column="1">
+            <view:NewsView/>
+        </DockPanel>
 
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
             <TextBlock Text="Zalogowany jako: "
