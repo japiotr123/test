@@ -1,11 +1,16 @@
 ﻿
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using Microsoft.VisualBasic;
 
 namespace PolMedUMG.ViewModel
 {
     public class CalendarModel
     {
         public ObservableCollection<DateTime> Months { get; set; }
+        public int year { get; set; }
 
         public void ReloadCalendar(int year)
 
@@ -28,7 +33,8 @@ namespace PolMedUMG.ViewModel
         }
         public CalendarModel()
         {
-            ReloadCalendar(DateTime.Now.Year);
+            year = DateTime.Now.Year;
+            ReloadCalendar(year);
         }
     
     }

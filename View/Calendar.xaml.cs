@@ -1,11 +1,11 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using PolMedUMG.ViewModel;
-
 namespace PolMedUMG.View
 {
     /// <summary>
--   /// Logika interakcji dla klasy Calendar.xaml
--   /// </summary>
+   /// Logika interakcji dla klasy Calendar.xaml
+   /// </summary>
     public partial class Calendar : UserControl
     {
         public Calendar()
@@ -19,8 +19,15 @@ namespace PolMedUMG.View
         {
             var calendar = (System.Windows.Controls.Calendar)sender;
             calendar.DisplayMode = CalendarMode.Month;
+            DateTime begin = (DateTime)calendar.DisplayDateStart;
+            calendar.DisplayDateEnd = begin.AddDays(DateTime.DaysInMonth(begin.Year, begin.Month) - 1);
         }
-
+        public void CalendarPrevious(object sender, RoutedEventArgs e)
+        {
+        }
+        public void CalendarNext(object sender, RoutedEventArgs e)
+        {
+        }
         private void Calendar_DisplayModeChanged(object sender, CalendarModeChangedEventArgs e)
         {
             ((System.Windows.Controls.Calendar)sender).DisplayMode = CalendarMode.Month;
