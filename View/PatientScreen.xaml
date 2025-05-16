@@ -89,7 +89,7 @@
         <DockPanel 
             x:Name="RightContentPanel"
             Grid.Row="0" Grid.Column="1">
-            <view:NewsView/>
+            <view:Messages/>
         </DockPanel>
 
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
