@@ -1,12 +1,51 @@
-﻿<UserControl x:Class="PolMedUMG.View.MakeAppointment"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Height="Auto" Width="Auto">
+﻿<Window x:Class="PolMedUMG.MakeAppointment"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Umów Wizytę" Height="450" Width="800">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
 
-    <TextBlock Text="Umów wizyte"
-           FontSize="26"
-           FontWeight="Bold"
-           HorizontalAlignment="Center"
-           Margin="0,0,0,20"/>
+        <!-- FORMULARZ -->
+        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+            <TextBlock Text="Imię i nazwisko:"/>
+            <TextBox x:Name="NameTextBox" Margin="0,5"/>
 
-</UserControl>
+            <TextBlock Text="Lekarz:"/>
+            <ComboBox x:Name="DoctorComboBox" Margin="0,5"/>
+
+            <TextBlock Text="Data wizyty:"/>
+            <DatePicker x:Name="DatePicker" Margin="0,5"/>
+
+            <TextBlock Text="Godzina wizyty:"/>
+            <TextBox x:Name="TimeTextBox" Margin="0,5"/>
+
+            <TextBlock Text="Cel wizyty:"/>
+            <TextBox x:Name="PurposeTextBox" Margin="0,5"/>
+
+            <TextBlock Text="Telefon kontaktowy:"/>
+            <TextBox x:Name="PhoneTextBox" Margin="0,5"/>
+
+            <TextBlock Text="Dodatkowe uwagi:"/>
+            <TextBox x:Name="NotesTextBox" Margin="0,5"/>
+
+            <Button Content="Umów wizytę" Click="ScheduleButton_Click" Margin="0,10"/>
+        </StackPanel>
+
+        <!-- PODSUMOWANIE -->
+        <Border Grid.Column="1" Background="White" Padding="20" CornerRadius="10" BorderBrush="LightGray" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="Podsumowanie wizyty" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                <TextBlock x:Name="SummaryName" Margin="0,5"/>
+                <TextBlock x:Name="SummaryDoctor" Margin="0,5"/>
+                <TextBlock x:Name="SummaryDate" Margin="0,5"/>
+                <TextBlock x:Name="SummaryTime" Margin="0,5"/>
+                <TextBlock x:Name="SummaryPurpose" Margin="0,5"/>
+                <TextBlock x:Name="SummaryPhone" Margin="0,5"/>
+                <TextBlock x:Name="SummaryNotes" Margin="0,5"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

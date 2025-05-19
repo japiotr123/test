@@ -70,5 +70,10 @@ namespace PolMedUMG.View
                 }
             }
         }
+
+        private void NewsView_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
