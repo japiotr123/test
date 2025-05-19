@@ -7,20 +7,16 @@ using System.Windows.Data;
 
 namespace PolMedUMG.View
 {
-    public class Conversation
-    {
-        public string DoctorName { get; set; }
-        public string Date { get; set; }
-        public string StatusText { get; set; }
-        public string DoctorImage { get; set; }
-    }
-
     public partial class Messages : UserControl
     {
-        public ObservableCollection<Conversation> Conversations { get; set; }
+        public ObservableCollection<ConvMessages> Conversations { get; set; }
+        public string date { get; }
+        public string doctorImage { get; }
 
-        private List<Conversation> AllConversations;
+        private List<ConvMessages> AllConversations;
+
         private int currentPage = 1;
+
         private int pageSize = 6;
         private int totalPages => (int)Math.Ceiling((double)AllConversations.Count / pageSize);
 
@@ -28,29 +24,21 @@ namespace PolMedUMG.View
         {
             InitializeComponent();
 
-            this.DataContext = this; 
+            var varii = new MessageRepository();
+            AllConversations = varii.ListOfUniqueDoctors(SessionManager.CurrentUsername);
+            Conversations = new ObservableCollection<ConvMessages>();
 
-            AllConversations = new List<Conversation>
-            {
-                new Conversation{DoctorName = "dr. Anna Maria Wesołowska",Date = "19.04.2024",StatusText = "nowa wiadomość",DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Witt",Date = "15.04.2024",StatusText = "odczytane",DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Andrzej Pędrak", Date = "28.03.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Smutas Kutas", Date = "10.02.2024", StatusText = "nowa wiadomość", DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Marek Towarek", Date = "12.01.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Tomasz Kowalski", Date = "07.11.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Eryk Fryderyk", Date = "02.11.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
-                new Conversation{DoctorName = "dr. Dobry Ziom", Date = "23.07.2023", StatusText = "odczytane", DoctorImage = "dummy.png"},
-            };
+            DataContext = this;
 
-            Conversations = new ObservableCollection<Conversation>();
             LoadCurrentPage();
+
         }
         private void LoadCurrentPage()
         {
             var pageVisits = AllConversations
-                .Skip((currentPage - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+        .Skip((currentPage - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
 
             Conversations.Clear();
             foreach (var item in pageVisits)
@@ -78,11 +66,11 @@ namespace PolMedUMG.View
         }
         private void ConversationList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ConversationList.SelectedItem is Conversation selectedConversation)
+            if (ConversationList.SelectedItem is ConvMessages selectedConversation)
             {
                 var Conv = new MessagesOpenConv(
                     selectedConversation.Date,
-                    selectedConversation.DoctorName,
+                    selectedConversation.Sender,
                     selectedConversation.DoctorImage,
                     selectedConversation
                 );

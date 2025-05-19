@@ -1,10 +1,9 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Interop;
 using System.Windows.Media;
+using MySql.Data.MySqlClient;
 
 
 namespace PolMedUMG.View
@@ -12,24 +11,19 @@ namespace PolMedUMG.View
     public partial class MessagesOpenConv : UserControl
     {
         public List<ConvMessages> Messages { get; set; }
-        public string date { get;  }
+        public DateTime date { get;  }
         public string doctorName { get; }
         public string doctorImage { get; }
-        public Conversation conversation { get; set; }
-        public MessagesOpenConv(string date, string doctorName, string doctorImage, Conversation conversation)
+        public ConvMessages conversation { get; set; }
+        public MessagesOpenConv(DateTime date, string doctorName, string doctorImage, ConvMessages conversation)
         {
 
             InitializeComponent();
 
             var repo = new MessageRepository();
-            Debug.WriteLine($"Liczba wiadomości: {SessionManager.CurrentUsername}");
+
             Messages = repo.GetMessagesFrom(doctorName, SessionManager.CurrentUsername);
 
-            Debug.WriteLine($"Liczba wiadomości: {Messages.Count}");
-            foreach (var msg in Messages)
-            {
-                Debug.WriteLine($"From: {msg.Sender} To: {msg.Receiver} Content: {msg.Content}");
-            }
 
             this.date = date;
             this.doctorName = doctorName;
@@ -40,7 +34,62 @@ namespace PolMedUMG.View
         }
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            //poki co crashuje trzeba tu dodac kod!
+            if (MainArea != null)
+            {
+                MainArea.Children.Clear();
+                MainArea.Children.Add(new Messages());
+            }
+        }
+        private void Send_Click(object sender, RoutedEventArgs e)
+        {
+            string messageText = MessageInput.Text;
+            string senderr = SessionManager.CurrentUsername;
+            string receiver = doctorName;
+            DateTime data = DateTime.Now;
+            string dataAsString = data.ToString();
+
+            if (!string.IsNullOrWhiteSpace(messageText))
+            {
+                var newMsg = new ConvMessages(senderr, receiver, DateTime.Now, messageText,"nowa wiadomość", "dummy");
+
+                Messages.Add(newMsg);
+
+                MessagesList.ItemsSource = null;
+                MessagesList.ItemsSource = Messages;
+
+
+                using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
+                {
+                    try
+                    {
+                        conn.Open();
+
+                        string sql = @"INSERT INTO Conversations (sender, receiver, date, content, status, doctorImage) 
+                           VALUES (@sender, @receiver, @date, @content, @status, @doctorImage);";
+
+                        using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@sender", senderr);
+                            cmd.Parameters.AddWithValue("@receiver", receiver);
+                            cmd.Parameters.AddWithValue("@date", dataAsString);
+                            cmd.Parameters.AddWithValue("@content", messageText);
+                            cmd.Parameters.AddWithValue("@status", "nowa wiadomość");
+                            cmd.Parameters.AddWithValue("@doctorImage", "dummy");
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Błąd podczas dodawania wiadomości: " + ex.Message);
+                    }
+                }
+                MessageInput.Text = "";
+            }
+            else
+            {
+                MessageBox.Show("Wiadomość jest pusta!");
+            }
         }
         public static bool compare(object value)
         {

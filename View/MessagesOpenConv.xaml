@@ -9,7 +9,7 @@
         <local:BoolToForegroundConverter x:Key="BoolToForegroundConverter" />
     </UserControl.Resources>
 
-    <Grid>
+    <Grid x:Name="MainArea">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -72,8 +72,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="MessageInput" BorderThickness="0" Background="Transparent" Grid.Column="0" VerticalAlignment="Center" Margin="5,0,10,0" Height="60" Width="Auto" DockPanel.Dock="Left" 
-                        VerticalContentAlignment="Center" Text="napisz wiadomość..." FontSize="18"/>
-                        <Button Content="wyślij" Grid.Column="1" Foreground="White" Height="60" Width="80" FontSize="17" HorizontalAlignment="Right">
+                        VerticalContentAlignment="Center" FontSize="18"/>
+                        <Button Content="wyślij" Click="Send_Click" Grid.Column="1" Foreground="White" Height="60" Width="80" FontSize="17" HorizontalAlignment="Right">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Background" Value="#5C84E2"/>
