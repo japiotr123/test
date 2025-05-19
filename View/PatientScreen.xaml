@@ -1,10 +1,10 @@
 ﻿<Window x:Class="PolMedUMG.View.PatientScreen"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:PolMedUMG.View"
         Title="Panel pacjenta" Height="720" Width="1280"
         WindowStyle="None"
         ResizeMode="NoResize"
-        xmlns:view="clr-namespace:PolMedUMG.View"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -19,23 +19,21 @@
 
         <!-- LEFT SIDEBAR -->
         <DockPanel Grid.Row="0" Grid.Column="0" Background="White">
-
             <!-- Logo -->
             <Image Source="{StaticResource di_PolMedLOGO}"
-                 Height="80"
-                 Margin="10"
-                 DockPanel.Dock="Top"
-                 Stretch="Uniform"/>
+                   Height="80" Margin="10"
+                   DockPanel.Dock="Top"
+                   Stretch="Uniform"/>
 
             <!-- Navigation List -->
             <ListBox x:Name="NavList"
-               DockPanel.Dock="Top"
-               Background="Transparent"
-               BorderThickness="0"
-               SelectionMode="Single"
-               Margin="0,10,0,0"
-               SelectedIndex="0"
-               SelectionChanged="MyListBox_SelectionChanged">
+                     DockPanel.Dock="Top"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     SelectionMode="Single"
+                     Margin="0,10,0,0"
+                     SelectedIndex="0"
+                     SelectionChanged="MyListBox_SelectionChanged">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -47,12 +45,12 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="Border"
-                            BorderThickness="0,0,0,1"
-                            BorderBrush="LightGray"
-                            Background="Transparent"
-                            Padding="20,16">
+                                            BorderThickness="0,0,0,1"
+                                            BorderBrush="LightGray"
+                                            Background="Transparent"
+                                            Padding="20,16">
                                         <ContentPresenter HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"/>
+                                                          VerticalAlignment="Center"/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
@@ -70,7 +68,7 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
 
-                <!-- Your menu items -->
+                <!-- Menu Items -->
                 <ListBoxItem>Strona główna</ListBoxItem>
                 <ListBoxItem>Umów wizytę</ListBoxItem>
                 <ListBoxItem>Kalendarz</ListBoxItem>
@@ -82,23 +80,19 @@
                 <ListBoxItem>Kontakt</ListBoxItem>
                 <ListBoxItem>Ustawienia konta</ListBoxItem>
             </ListBox>
-
         </DockPanel>
 
         <!-- RIGHT CONTENT AREA -->
-        <DockPanel 
-            x:Name="RightContentPanel"
-            Grid.Row="0" Grid.Column="1">
-            <view:NewsView Loaded="NewsView_Loaded"/>
-        </DockPanel>
+        <ContentControl x:Name="MainContentControl" 
+                        Grid.Row="0" Grid.Column="1" />
 
+        <!-- Footer -->
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
-            <TextBlock Text="Zalogowany jako: "
-                 VerticalAlignment="Center"
-                 FontSize="14"
-                 FontWeight="Bold"
-                 Foreground="White"/>
+            <TextBlock Text="Zalogowany jako: " 
+                       VerticalAlignment="Center" 
+                       FontSize="14" 
+                       FontWeight="Bold" 
+                       Foreground="White"/>
         </Border>
     </Grid>
-
 </Window>

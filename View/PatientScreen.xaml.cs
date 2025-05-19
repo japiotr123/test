@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace PolMedUMG.View
 {
@@ -14,16 +9,14 @@ namespace PolMedUMG.View
         public PatientScreen()
         {
             InitializeComponent();
-            LoadContent(new NewsView());
+            LoadContent(new NewsView()); // Domyślny widok po uruchomieniu
         }
 
         public void LoadContent(UserControl control)
         {
-
-            if (RightContentPanel != null)
+            if (MainContentControl != null)
             {
-                RightContentPanel.Children.Clear();
-                RightContentPanel.Children.Add(control);
+                MainContentControl.Content = control;
             }
         }
 
@@ -73,7 +66,7 @@ namespace PolMedUMG.View
 
         private void NewsView_Loaded(object sender, RoutedEventArgs e)
         {
-
+            // Jeśli potrzebujesz zainicjować coś przy ładowaniu NewsView, dodaj tu kod
         }
     }
 }
