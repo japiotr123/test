@@ -40,7 +40,6 @@ namespace PolMedUMG.View
                 new Conversation{DoctorName = "dr. Tomasz Kowalski", Date = "07.11.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
                 new Conversation{DoctorName = "dr. Eryk Fryderyk", Date = "02.11.2024", StatusText = "odczytane", DoctorImage = "dummy.png"},
                 new Conversation{DoctorName = "dr. Dobry Ziom", Date = "23.07.2023", StatusText = "odczytane", DoctorImage = "dummy.png"},
-
             };
 
             Conversations = new ObservableCollection<Conversation>();
@@ -75,6 +74,37 @@ namespace PolMedUMG.View
             {
                 currentPage++;
                 LoadCurrentPage();
+            }
+        }
+        private void ConversationList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ConversationList.SelectedItem is Conversation selectedConversation)
+            {
+                var Conv = new MessagesOpenConv(
+                    selectedConversation.Date,
+                    selectedConversation.DoctorName,
+                    selectedConversation.DoctorImage,
+                    selectedConversation
+                );
+                var parentWindow = Window.GetWindow(this) as PatientScreen;
+
+                if (parentWindow != null)
+                {
+                    parentWindow.LoadContent(Conv);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Nie udało się znaleźć nadrzędnego okna.");
+                }
+            }
+        }
+        public void LoadContent(UserControl control)
+        {
+
+            if (MainArea != null)
+            {
+                MainArea.Children.Clear();
+                MainArea.Children.Add(control);
             }
         }
     }

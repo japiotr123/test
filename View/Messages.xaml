@@ -32,7 +32,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="20">
+    <Grid Margin="20" x:Name="MainArea">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -49,7 +49,7 @@
         </StackPanel>
         
         <!-- Lista konwersacji -->
-        <ListView ItemsSource="{Binding Conversations}" BorderThickness="0" Grid.Row="1" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+        <ListView x:Name="ConversationList" ItemsSource="{Binding Conversations}" SelectionChanged="ConversationList_SelectionChanged" BorderThickness="0" Grid.Row="1" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                     <Border Margin="5" Padding="8" CornerRadius="10" BorderBrush="LightGray" BorderThickness="1" >
@@ -100,37 +100,11 @@
 
         <!-- Scroll po stronach -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Button Content="◀" 
-            Width="30" Height="30" 
-            Margin="10,0" 
-            Background="Transparent" 
-            BorderBrush="Transparent"
-            Foreground="#476EFF"
-            FontSize="18"
-            Click="PrevPage_Click"/>
-
-
-            <Border Background="#8093FF"
-            CornerRadius="10"
-            Padding="5,2"
-            Margin="5,0">
-                <TextBlock x:Name="PageCounterText"
-                   Text="1/1"
-                   Foreground="White"
-                   FontWeight="Bold"
-                   FontSize="16"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+            <Button Content="◀" Width="30" Height="30" Margin="10,0" Background="Transparent" BorderBrush="Transparent" Foreground="#476EFF" FontSize="18" Click="PrevPage_Click"/>
+            <Border Background="#8093FF" CornerRadius="10" Padding="5,2" Margin="5,0">
+                <TextBlock x:Name="PageCounterText" Text="1/1" Foreground="White" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
-
-            <Button Content="▶" 
-            Width="30" Height="30" 
-            Margin="10,0" 
-            Background="Transparent" 
-            BorderBrush="Transparent"
-            Foreground="#476EFF"
-            FontSize="18"
-            Click="NextPage_Click"/>
+            <Button Content="▶" Width="30" Height="30" Margin="10,0" Background="Transparent" BorderBrush="Transparent" Foreground="#476EFF" FontSize="18" Click="NextPage_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

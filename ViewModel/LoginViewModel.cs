@@ -41,7 +41,7 @@ namespace PolMedUMG.ViewModel
         {
             // Przechowuje informacj� dotycz�ce po��czenia z baz� danych
             string connStrSQL = "server=bwpd1lnfwwmd8zooiosa-mysql.services.clever-cloud.com;uid=uf9nqf7gizjdvxmm;pwd=mV5lVFodqkbncFJJnxqQ;database=bwpd1lnfwwmd8zooiosa";
-
+            SessionManager.CurrentUsername = _username;
             try
             {
                 MySql.Data.MySqlClient.MySqlConnection conn = new MySql.Data.MySqlClient.MySqlConnection(connStrSQL);
