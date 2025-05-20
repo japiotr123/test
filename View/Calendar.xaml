@@ -4,12 +4,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:fa="clr-namespace:FontAwesome.WPF;assembly=FontAwesome.WPF"
-    xmlns:viewmodel="clr-namespace:PolMedUMG.ViewModel"
     xmlns:System="clr-namespace:System;assembly=System.Runtime"
     xmlns:local="clr-namespace:PolMedUMG.ViewModel"
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+    xml:lang="pl-PL"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance d:Type=local:CalendarModel,IsDesignTimeCreatable=True}"
+    d:DataContext="{d:DesignInstance local:CalendarModel ,IsDesignTimeCreatable=True}"
              >
     <UserControl.Resources>
         <Style x:Key="CalendarCalendarItemStyle1" TargetType="{x:Type CalendarItem}">
@@ -24,9 +24,32 @@
                                     <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Fill="black" Height="2"/>
                                 </Grid>
                             </DataTemplate>
+                            <ControlTemplate x:Key="HeaderButtonTemplate" TargetType="{x:Type Button}">
+                                <Grid>
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal"/>
+                                            <VisualState x:Name="Disabled">
+                                                <Storyboard>
+                                                    <DoubleAnimation Duration="0" Storyboard.TargetName="buttonContent" To=".5" Storyboard.TargetProperty="Opacity"/>
+                                                </Storyboard>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                      Content="{Binding DisplayDate,
+                                                      RelativeSource={RelativeSource AncestorType=Calendar}}"
+                                                      ContentStringFormat="{}{0:MMMM}"
+                                                      TextElement.Foreground="#FF333333"
+                                                      TextElement.FontFamily="DejaVu Sans"                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      Margin="1,4,1,9"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      />
+                                </Grid>
+                            </ControlTemplate>
+
                         </ControlTemplate.Resources>
                         <Grid x:Name="PART_Root">
-
                             <Grid.Resources>
                                 <SolidColorBrush x:Key="DisabledColor" Color="#A5FFFFFF"/>
                             </Grid.Resources>
@@ -35,17 +58,23 @@
                                     <VisualState x:Name="Normal"/>
                                     <VisualState x:Name="Disabled">
                                         <Storyboard>
-
                                             <DoubleAnimation Duration="0" Storyboard.TargetName="PART_DisabledVisual" To="1" Storyboard.TargetProperty="Opacity"/>
                                         </Storyboard>
                                     </VisualState>
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="1">
-                                <Border BorderBrush="#FFFFFFFF" BorderThickness="0" CornerRadius="1">
+                                <Border Background="white" BorderBrush="#FFFFFFFF" BorderThickness="0" CornerRadius="1">
                                     <Grid>
-
-                                        <Grid x:Name="PART_MonthView" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="8,-1,8,8" Grid.Row="1" Visibility="Visible">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Column="1" Focusable="False" FontWeight="Bold" FontSize="10.5" HorizontalAlignment="Center" Grid.Row="0" Template="{StaticResource HeaderButtonTemplate}" VerticalAlignment="Center"/>
+                                        <Grid x:Name="PART_MonthView" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="8,-1,8,8" Grid.Row="1" Visibility="Visible" TextElement.FontWeight="Bold">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
@@ -76,7 +105,6 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Visibility" TargetName="PART_DisabledVisual" Value="Visible"/>
                             </Trigger>
-
                             <DataTrigger Binding="{Binding DisplayMode, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Calendar}}}" Value="Year">
                                 <Setter Property="Visibility" TargetName="PART_MonthView" Value="Hidden"/>
                                 <Setter Property="Visibility" TargetName="PART_YearView" Value="Visible"/>
@@ -93,15 +121,17 @@
     </UserControl.Resources>
     <StackPanel Background="White">
         <UniformGrid Margin="36,18,47,18" HorizontalAlignment="Center" Columns="3">
-            <Button Background="White"  Click="CalendarPrevious">
+            <Button Background="White"  Click="CalendarPrevious" >
                 <fa:ImageAwesome Icon="ArrowLeft" Margin="7" Width="20"/>
             </Button>
-            <TextBlock  Margin="6" FontSize="24" FontWeight="Bold" Text="{Binding year}"/>
-            <Button Background="White" Click="CalendarNext">
+            <Border BorderThickness="0.5" BorderBrush="Black">
+                <TextBlock  d:Text="{Binding year}" x:Name="rok" Margin="6" FontSize="24" FontWeight="Bold"/>
+            </Border>
+            <Button Background="White" Click="CalendarNext" >
                 <fa:ImageAwesome Icon="ArrowRight" Margin="7" Width="20"/>
             </Button>
         </UniformGrid>
-        <ItemsControl ItemsSource="{Binding Months}">
+        <ItemsControl x:Name="monthGrid"  d:ItemsSource="{Binding Months}">
             <ItemsControl.ItemsPanel>
 
                 <ItemsPanelTemplate>
@@ -112,15 +142,15 @@
                 <DataTemplate>
                     <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}"
                           DisplayDateStart="{Binding .}"
-                          DisplayMode="Month"
-                          DisplayModeChanged="Calendar_DisplayModeChanged"
+                          DisplayMode="Month" 
                           Loaded="Calendar_Loaded"
                           Margin="20"
                           KeyboardNavigation.DirectionalNavigation="None"
                           BorderThickness="0" RenderTransformOrigin="0.5,0.5" FontSize="24">
+
                         <Calendar.RenderTransform>
                             <TransformGroup>
-                                <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                                <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
                                 <SkewTransform/>
                                 <RotateTransform/>
                                 <TranslateTransform/>

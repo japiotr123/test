@@ -1,20 +1,17 @@
-﻿
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using Microsoft.VisualBasic;
+﻿using System.Collections.ObjectModel;
 
 namespace PolMedUMG.ViewModel
 {
+    /// <summary>
+    /// ViewModel umożliwiający poprawne wyświetlenie kalendarzy w Designerze
+    /// </summary>
     public class CalendarModel
     {
         public ObservableCollection<DateTime> Months { get; set; }
         public int year { get; set; }
-
-        public void ReloadCalendar(int year)
-
+        public CalendarModel()
         {
+            year = DateTime.Now.Year; 
             Months = new ObservableCollection<DateTime>
             {
                 new DateTime(year, 1, 1),
@@ -30,11 +27,6 @@ namespace PolMedUMG.ViewModel
                 new DateTime(year, 11, 1),
                 new DateTime(year, 12, 1)
             };
-        }
-        public CalendarModel()
-        {
-            year = DateTime.Now.Year;
-            ReloadCalendar(year);
         }
     
     }
