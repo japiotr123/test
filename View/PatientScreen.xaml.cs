@@ -14,9 +14,10 @@ namespace PolMedUMG.View
 
         public void LoadContent(UserControl control)
         {
-            if (MainContentControl != null)
+            if (RightContentPanel != null)
             {
-                MainContentControl.Content = control;
+                RightContentPanel.Children.Clear();
+                RightContentPanel.Children.Add(control);
             }
         }
 

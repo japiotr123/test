@@ -83,10 +83,13 @@
         </DockPanel>
 
         <!-- RIGHT CONTENT AREA -->
-        <ContentControl x:Name="MainContentControl" 
-                        Grid.Row="0" Grid.Column="1" />
+        <DockPanel 
+            x:Name="RightContentPanel"
+            Grid.Row="0" Grid.Column="1">
+            <view:Messages/>
+            </DockPanel>
 
-        <!-- Footer -->
+            <!-- Footer -->
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
             <TextBlock Text="Zalogowany jako: " 
                        VerticalAlignment="Center" 
