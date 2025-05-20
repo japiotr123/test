@@ -24,6 +24,7 @@ namespace PolMedUMG.View
 
             Messages = repo.GetMessagesFrom(doctorName, SessionManager.CurrentUsername);
 
+            repo.markAsReaded(doctorName, SessionManager.CurrentUsername);
 
             this.date = date;
             this.doctorName = doctorName;
@@ -50,7 +51,7 @@ namespace PolMedUMG.View
 
             if (!string.IsNullOrWhiteSpace(messageText))
             {
-                var newMsg = new ConvMessages(senderr, receiver, DateTime.Now, messageText,"nowa wiadomość", "dummy");
+                var newMsg = new ConvMessages(senderr, receiver, DateTime.Now, messageText,"nowa wiadomość", "dummy", "Odczytane");
 
                 Messages.Add(newMsg);
 
@@ -64,8 +65,8 @@ namespace PolMedUMG.View
                     {
                         conn.Open();
 
-                        string sql = @"INSERT INTO Conversations (sender, receiver, date, content, status, doctorImage) 
-                           VALUES (@sender, @receiver, @date, @content, @status, @doctorImage);";
+                        string sql = @"INSERT INTO Conversations (sender, receiver, date, content, status, doctorImage, statusPatient) 
+                           VALUES (@sender, @receiver, @date, @content, @status, @doctorImage, @statusPatient);";
 
                         using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                         {
@@ -75,6 +76,7 @@ namespace PolMedUMG.View
                             cmd.Parameters.AddWithValue("@content", messageText);
                             cmd.Parameters.AddWithValue("@status", "nowa wiadomość");
                             cmd.Parameters.AddWithValue("@doctorImage", "dummy");
+                            cmd.Parameters.AddWithValue("@statusPatient", "Odczytane");
 
                             cmd.ExecuteNonQuery();
                         }

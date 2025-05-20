@@ -25,7 +25,7 @@ namespace PolMedUMG.View
             InitializeComponent();
 
             var varii = new MessageRepository();
-            AllConversations = varii.ListOfUniqueDoctors(SessionManager.CurrentUsername);
+            AllConversations = varii.ListOfUniqueDoctors(SessionManager.CurrentUsername).OrderByDescending(c => c.Date).ToList();
             Conversations = new ObservableCollection<ConvMessages>();
 
             DataContext = this;
@@ -108,7 +108,7 @@ namespace PolMedUMG.View
             {
                 case "nowa wiadomość":
                     return FontAwesomeIcon.Envelope; // ikona dla nowej wiadomości
-                case "odczytane":
+                case "Odczytane":
                     return FontAwesomeIcon.CheckCircle; // ikona dla odczytane
                 default:
                     return FontAwesomeIcon.CheckCircle;

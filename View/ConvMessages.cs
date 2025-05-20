@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 
 namespace PolMedUMG.View
@@ -10,16 +12,18 @@ namespace PolMedUMG.View
         public DateTime Date { get; set; }
         public string Content { get; set; }
         public string DoctorImage { get; set; }
-        public string Status { get; set;  }
+        public string StatusPatient { get; set;  }
+        public string StatusDoctor { get; set; }
 
-        public ConvMessages(string sender, string receiver, DateTime date, string content, string status, string doctorImage)
+        public ConvMessages(string sender, string receiver, DateTime date, string content, string statusDoctor, string doctorImage, string statusPatient)
         {
             Sender = sender;
             Receiver = receiver;
             Date = date;
             Content = content;
-            Status = status;
+            StatusDoctor = statusDoctor;
             DoctorImage = doctorImage;
+            StatusPatient = statusPatient;
         } 
         
     }
@@ -34,7 +38,7 @@ namespace PolMedUMG.View
                 try
                 {
                     conn.Open();
-                    string sql = "SELECT uid, sender, receiver, date, content, status, doctorImage FROM Conversations;";
+                    string sql = "SELECT uid, sender, receiver, date, content, status, doctorImage, statusPatient FROM Conversations;";
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -46,7 +50,8 @@ namespace PolMedUMG.View
                                 Convert.ToDateTime(reader["date"]),
                                 reader["content"].ToString(),
                                 reader["status"].ToString(),
-                                reader["doctorImage"].ToString()
+                                reader["doctorImage"].ToString(),
+                                reader["statusPatient"].ToString()
                             );
                             conversations.Add(msg);
                         }
@@ -61,21 +66,21 @@ namespace PolMedUMG.View
 
             return conversations;
         }
-        public List<ConvMessages> GetMessages() // ta metoda zwraca wszystkie wiadomosci
+        public List<ConvMessages> GetMessages() // ta metoda ma wiadomości testowe niezwiązane z bazą danych
         {
 
             var ConvMessages = new List<ConvMessages>
             {
-                new ConvMessages("dr. Witt", "patient", new DateTime(2004, 12, 12), "Witam serdecznie kochaniutki", "Odczytane" , "dummy"),
-                new ConvMessages("patient", "dr. Witt", DateTime.Now, "Cześć, jak się masz?", "Odczytane" , "dummy"),
-                new ConvMessages("dr. Witt", "Patient", DateTime.Now, "Nie twoj interes kasztanie", "Odczytane" , "dummy"),
-                new ConvMessages("dr. Marek Towarek", "patient", DateTime.Now, "tescik1", "Odczytane" , "dummy"),
-                new ConvMessages("patient", "dr. Tomasz Kowalski", DateTime.Now, "tescik2", "Odczytane" , "dummy"),
-                new ConvMessages("patient", "dr. Andrzej Pędrak", DateTime.Now, "tescik3333", "Odczytane" , "dummy"),
-                new ConvMessages("dr. Witt", "patient", DateTime.Now, "w sumie dziala", "Odczytane" , "dummy"),
-                new ConvMessages("patient", "dr. Witt", DateTime.Now, "a no", "Odczytane" , "dummy"),
-                new ConvMessages("patient", "dr. Eryk Fryderyk", DateTime.Now, "a no", "Odczytane" , "dummy"),
-                new ConvMessages("dr. Moczybroda", "patient", DateTime.Now, "siema byku jak tam kodowanie", "nowa wiadomość" , "dummy")
+                new ConvMessages("dr. Witt", "patient", new DateTime(2004, 12, 12), "Witam serdecznie kochaniutki", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("patient", "dr. Witt", DateTime.Now, "Cześć, jak się masz?", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("dr. Witt", "Patient", DateTime.Now, "Nie twoj interes kasztanie", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("dr. Marek Towarek", "patient", DateTime.Now, "tescik1", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("patient", "dr. Tomasz Kowalski", DateTime.Now, "tescik2", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("patient", "dr. Andrzej Pędrak", DateTime.Now, "tescik3333", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("dr. Witt", "patient", DateTime.Now, "w sumie dziala", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("patient", "dr. Witt", DateTime.Now, "a no", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("patient", "dr. Eryk Fryderyk", DateTime.Now, "a no", "Odczytane" , "dummy", "Odczytane"),
+                new ConvMessages("dr. Moczybroda", "patient", DateTime.Now, "siema byku jak tam kodowanie", "nowa wiadomość" , "dummy", "Odczytane")
             };
             return ConvMessages;
         }
@@ -116,7 +121,8 @@ namespace PolMedUMG.View
                         receiver: lastMsg.Receiver,
                         date: lastMsg.Date,
                         content: lastMsg.Content,
-                        status: lastMsg.Status,
+                        statusDoctor: lastMsg.StatusDoctor,
+                        statusPatient: lastMsg.StatusPatient,
                         doctorImage: lastMsg.DoctorImage
                     );
                 })
@@ -124,9 +130,26 @@ namespace PolMedUMG.View
 
             return uniqueDoctors;
         }
-        private void markAsReaded(object sender, RoutedEventArgs e)
+        public void markAsReaded(string doctorName, string patientName) // markuje jako przeczytane wiadomości
         {
+            string connectionString = SessionManager.connStrSQL;
 
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = @"UPDATE Conversations SET statusPatient = @newStatus WHERE Sender = @doctorName AND Receiver = @patientName AND statusPatient = @currentStatus";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@newStatus", "Odczytane");
+                    cmd.Parameters.AddWithValue("@currentStatus", "nowa wiadomość");
+                    cmd.Parameters.AddWithValue("@doctorName", doctorName);
+                    cmd.Parameters.AddWithValue("@patientName", patientName);
+
+                    int affected = cmd.ExecuteNonQuery();
+                    Debug.WriteLine($"[DEBUG] Zaktualizowano {affected} wiadomości.");
+                }
+            }
         }
     }
 }
