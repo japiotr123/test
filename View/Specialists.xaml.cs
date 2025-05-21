@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PolMedUMG.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,7 @@ namespace PolMedUMG.View
         public Specialists()
         {
             InitializeComponent();
+            DataContext = new SpecialistsViewModel();
         }
     }
 }
