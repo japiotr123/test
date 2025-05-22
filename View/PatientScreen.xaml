@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:view="clr-namespace:PolMedUMG.View"
         Title="Panel pacjenta" Height="720" Width="1280"
+        xmlns:fa="clr-namespace:FontAwesome.WPF;assembly=FontAwesome.WPF"
         WindowStyle="None"
         ResizeMode="NoResize"
+        MouseDown="Window_MouseDown"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -16,9 +18,16 @@
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        
         <!-- LEFT SIDEBAR -->
         <DockPanel Grid.Row="0" Grid.Column="0" Background="White">
+            <DockPanel.Effect>
+                <DropShadowEffect Color="Black"
+                          Direction="0"
+                          ShadowDepth="4"
+                          BlurRadius="8"
+                          Opacity="0.2"/>
+            </DockPanel.Effect>
             <!-- Logo -->
             <Image Source="{StaticResource di_PolMedLOGO}"
                    Height="80" Margin="10"
@@ -87,15 +96,12 @@
             x:Name="RightContentPanel"
             Grid.Row="0" Grid.Column="1">
             <view:Messages/>
-            </DockPanel>
+        </DockPanel>
 
             <!-- Footer -->
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="DarkGray" Padding="10">
-            <TextBlock Text="Zalogowany jako: " 
-                       VerticalAlignment="Center" 
-                       FontSize="14" 
-                       FontWeight="Bold" 
-                       Foreground="White"/>
+            <TextBlock Text="{Binding LoggedInUser}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="White">
+            </TextBlock>
         </Border>
     </Grid>
 </Window>
