@@ -12,6 +12,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PolMedUMG.Model;            // dla Specialist
+using PolMedUMG.View;             // dla MessagesOpenConv
+using PolMedUMG.View;
+using System.Diagnostics;             // jeżeli MessageRepository jest w tej przestrzeni
 
 namespace PolMedUMG.View
 {
@@ -25,5 +29,46 @@ namespace PolMedUMG.View
             InitializeComponent();
             DataContext = new SpecialistsViewModel();
         }
+
+        private void Specialist_Click(object sender, MouseButtonEventArgs e)
+        {
+            // 1) Pobierz kliknięty kafelek i model Specialist:
+            if (!(sender is FrameworkElement element && element.DataContext is Specialist spec))
+                return;
+
+            // 2) Załaduj historię rozmów z tego lekarzem:
+            var repo = new MessageRepository();
+            // GetMessagesFrom zwraca listę ConvMessages posortowaną od najstarszych
+            var history = repo
+                .GetMessagesFrom(spec.Name, SessionManager.CurrentUsername)
+                .OrderBy(m => m.Date)
+                .ToList();
+
+            // 3) Przygotuj parametry do MessagesOpenConv:
+            //    jeśli brak wiadomości - ustaw domyślnie
+            var lastMsg = history.LastOrDefault();
+            var date = lastMsg?.Date ?? DateTime.Now;
+            var img = lastMsg?.DoctorImage ?? "default_doctor.png";
+
+            // 4) Stwórz kontrolkę czatu:
+            var chatControl = new MessagesOpenConv(
+                date,               // data ostatniej wiadomości
+                spec.Name,          // imię lekarza ("dr. XX")
+                img,                // obrazek lekarza
+                lastMsg             // ostatnia wiadomość (ConvMessages)
+            );
+
+            // 5) Wywołaj metodę LoadContent w głównym oknie (PatientScreen):
+            var parentWindow = Window.GetWindow(this) as PatientScreen;
+            if (parentWindow != null)
+            {
+                parentWindow.LoadContent(chatControl);
+            }
+            else
+            {
+                Debug.WriteLine("Nie znaleziono PatientScreen, nie można załadować czatu.");
+            }
+        }
+
     }
 }
