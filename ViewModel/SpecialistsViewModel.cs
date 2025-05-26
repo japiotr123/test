@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using FontAwesome.WPF;
+using MySql.Data.MySqlClient;
 using PolMedUMG.Model;
 using PolMedUMG.View;
 using System;
@@ -27,6 +28,9 @@ namespace PolMedUMG.ViewModel
     public class SpecialistsViewModel
     {
         public ObservableCollection<Specialist> Specialists { get; set; }
+        public string Name { get; set; }
+        public string Title { get; set; }
+        public FontAwesomeIcon Icon { get; set; }
 
         public SpecialistsViewModel()
         {
@@ -50,7 +54,7 @@ namespace PolMedUMG.ViewModel
                                 reader["secondName"].ToString()
                             );
 
-                            Specialists.Add(new Specialist { Icon = "UserMd", Title = "Tytuł", Name = $"dr. {doctor.firstName} {doctor.secondName}" });
+                            Specialists.Add(new Specialist { Uid = doctor.uid, Icon = "UserMd", Title = "Tytuł", Name = $"dr. {doctor.firstName} {doctor.secondName}" });
                         }
                     }
                 }
