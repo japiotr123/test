@@ -119,7 +119,8 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel Background="White">
+    
+    <StackPanel>
         <UniformGrid Margin="36,18,47,18" HorizontalAlignment="Center" Columns="3">
             <Button Background="White"  Click="CalendarPrevious" >
                 <fa:ImageAwesome Icon="ArrowLeft" Margin="7" Width="20"/>
@@ -133,7 +134,6 @@
         </UniformGrid>
         <ItemsControl x:Name="monthGrid"  d:ItemsSource="{Binding Months}">
             <ItemsControl.ItemsPanel>
-
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="3" Columns="4"/>
                 </ItemsPanelTemplate>
@@ -144,6 +144,7 @@
                           DisplayDateStart="{Binding .}"
                           DisplayMode="Month" 
                           Loaded="Calendar_Loaded"
+                          SelectedDatesChanged="Calendar_SelectionChanged"
                           Margin="20"
                           KeyboardNavigation.DirectionalNavigation="None"
                           BorderThickness="0" RenderTransformOrigin="0.5,0.5" FontSize="24">
