@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using MySqlX.XDevAPI;
 using System.Data.Common;
+using System.Reflection.PortableExecutable;
 
 namespace PolMedUMG.ViewModel
 {
@@ -39,66 +40,98 @@ namespace PolMedUMG.ViewModel
 
         private void Login()
         {
-            // Przechowuje informacj� dotycz�ce po��czenia z baz� danych
-            SessionManager.connStrSQL = "server=bb97fob4mmaybcvttjjk-mysql.services.clever-cloud.com;uid=uirqsom4re7q6gwn;pwd=ODh2O0u6eNj3uUkXsLYO;database=bb97fob4mmaybcvttjjk";
-            //      nowy                "server=bb97fob4mmaybcvttjjk-mysql.services.clever-cloud.com;uid=uirqsom4re7q6gwn;pwd=ODh2O0u6eNj3uUkXsLYO;database=bb97fob4mmaybcvttjjk"
-            //      stary               "server=bwpd1lnfwwmd8zooiosa-mysql.services.clever-cloud.com;uid=uf9nqf7gizjdvxmm;pwd=mV5lVFodqkbncFJJnxqQ;database=bwpd1lnfwwmd8zooiosa"
             SessionManager.CurrentUsername = _username;
             try
             {
                 MySql.Data.MySqlClient.MySqlConnection conn = new MySql.Data.MySqlClient.MySqlConnection(SessionManager.connStrSQL);
                 conn.Open();
 
-                // Zapytanie do bazy o wybranego u�ytkownika
+                // Zapytanie do bazy o wybranego uzytkownika
                 MySqlCommand query = new MySqlCommand();
                 query.Connection = conn;
-                query.CommandText = @"SELECT COUNT(*) FROM users WHERE uid = @uid AND pwd = @pwd;";
+                query.CommandText = @"SELECT COUNT(*) FROM users WHERE uid = @uid;";
                 query.Parameters.AddWithValue("@uid", _username);
-                query.Parameters.AddWithValue("@pwd", _password);
                 int userCount = (int)(long)query.ExecuteScalar();
                 conn.Close();
                 if (userCount > 0)
                 {
-                    // Istnieje u�ytkownik z takimi danymi
+                    // Istnieje uzytkownik z takimi danymi
                     try
                     {
                         conn.Open();
-                        // Sprawdzamy jakiego typu jest u�ytkownik
+                        
+                        // Sprawdzamy jakiego typu jest uzytkownik
                         MySqlCommand query2 = new MySqlCommand();
                         query2.Connection = conn;
-                        query2.CommandText = @"SELECT acc_type FROM users WHERE uid = @uid AND pwd = @pwd;";
+                        query2.CommandText = @"SELECT acc_type FROM users WHERE uid = @uid;";
                         query2.Parameters.AddWithValue("@uid", _username);
-                        query2.Parameters.AddWithValue("@pwd", _password);
                         String acctype = query2.ExecuteScalar().ToString();
-
                         SessionManager.accType = acctype;
-                        // wyslanie do bazy daty logowania
-                        MySqlCommand updateLoginTime = new MySqlCommand();
-                        updateLoginTime.Connection = conn;
-                        updateLoginTime.CommandText = @"UPDATE users SET last_login = @loginTime WHERE uid = @uid;";
-                        updateLoginTime.Parameters.AddWithValue("@loginTime", DateTime.Now);
-                        updateLoginTime.Parameters.AddWithValue("@uid", _username);
-                        updateLoginTime.ExecuteNonQuery();
+                        
+                        // pobieranie hasla
+                        MySqlCommand passwd = new MySqlCommand();
+                        passwd.Connection = conn;
+                        passwd.CommandText = @"SELECT pwd FROM users WHERE uid = @uid;";
+                        passwd.Parameters.AddWithValue("@uid", _username);
+                        String password = passwd.ExecuteScalar().ToString();
+                        
+                        //pobieranie recovery hasla, o ile istnieje
+                        MySqlCommand recpass = new MySqlCommand();
+                        recpass.Connection = conn;
+                        recpass.CommandText = @"SELECT newPass, dateOfGeneration FROM PassRecovery WHERE username = @username ORDER BY dateOfGeneration DESC LIMIT 1;";
+                        recpass.Parameters.AddWithValue("@username", _username);
+                        string recoveryPassword = null;
+                        DateTime dateOfGeneration = DateTime.MinValue;
 
-                        conn.Close();
-                        // W zale�no�ci od typu u�ytkownika otwieramy odpowiednie okno
-                        if (acctype.Equals("2"))
+                        using (var reader = recpass.ExecuteReader())
                         {
-                            MessageBox.Show("Zalogowano jako admin");
+                            if (reader.Read())
+                            {
+                                recoveryPassword = reader["newPass"].ToString();
+                                dateOfGeneration = Convert.ToDateTime(reader["dateOfGeneration"]);
+                                
+                            }
+                            else
+                            {
+                                recoveryPassword = null;
+                                dateOfGeneration = DateTime.MinValue;
+                            }
                         }
-                        else if (acctype.Equals("1"))
-                        {
-                            DoctorScreen doctorWindow = new DoctorScreen();
-                            doctorWindow.Show();
-                            Application.Current.MainWindow.Close();
+                        TimeSpan timeSinceGeneration = DateTime.Now - dateOfGeneration;
+
+                        if (password == _password || (_password == recoveryPassword && timeSinceGeneration.TotalMinutes <= 15)) 
+                        { // dodac stosowna informacje ze haslo wygaslo, usunac z bazy niepotrzebne hasla
+                            MySqlCommand updateLoginTime = new MySqlCommand();
+                            updateLoginTime.Connection = conn;
+                            updateLoginTime.CommandText = @"UPDATE users SET last_login = @loginTime WHERE uid = @uid;";
+                            updateLoginTime.Parameters.AddWithValue("@loginTime", DateTime.Now);
+                            updateLoginTime.Parameters.AddWithValue("@uid", _username);
+                            updateLoginTime.ExecuteNonQuery();
+
+                            
+                            // W zaleznosci od typu uzytkownika otwieramy odpowiednie okno
+                            if (acctype.Equals("2"))
+                            {
+                                MessageBox.Show("Zalogowano jako admin");
+                            }
+                            else if (acctype.Equals("1"))
+                            {
+                                DoctorScreen doctorWindow = new DoctorScreen();
+                                doctorWindow.Show();
+                                Application.Current.MainWindow.Close();
+                            }
+                            else
+                            {
+                                PatientScreen patientWindow = new PatientScreen();
+                                patientWindow.Show();
+                                Application.Current.MainWindow.Close();
+                            }
                         }
                         else
                         {
-                            PatientScreen patientWindow = new PatientScreen();
-                            patientWindow.Show();
-                            Application.Current.MainWindow.Close();
+                            MessageBox.Show("Cos poszlo nie tak");
                         }
-
+                            conn.Close();
                     }
                     catch (MySql.Data.MySqlClient.MySqlException ex)
                     {
@@ -107,7 +140,7 @@ namespace PolMedUMG.ViewModel
                 }
                 else
                 {
-                    MessageBox.Show("Niepoprawny login lub has�o");
+                    MessageBox.Show("Niepoprawny login lub haslo");
                 }
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)

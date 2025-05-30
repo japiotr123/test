@@ -15,16 +15,15 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <DockPanel Grid.Row="0" Background="White" Margin="0,0,0,10" VerticalAlignment="Center" Height="80">
-            <DockPanel.Effect>
+        <Border CornerRadius="20" Background="White" Margin="40,10,40,0">
+            <Border.Effect>
                 <DropShadowEffect Color="Black" Direction="270" ShadowDepth="5" BlurRadius="10" Opacity="0.3"/>
-            </DockPanel.Effect>
-            <Image Width="40" Height="40" Source="{Binding doctorImage}" Margin="10"/>
-            <TextBlock Text="{Binding doctorName}" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="5"/>
-            <!-- ostatnie logowanie trzeba dodac do bazy danych -->
-            <TextBlock Text="ostatnie logowanie: 17.05.2025 17:32" FontSize="15" Foreground="Gray" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="15,0,10,0"/>
-            <Button BorderThickness="0" Content="wróć" Click="Back_Click" Margin="10" HorizontalAlignment="Right" Foreground="White" >
+            </Border.Effect>
+            <DockPanel Grid.Row="0"  Margin="10,10,10,10" VerticalAlignment="Center" Height="60">
+                <Image Width="40" Height="40" Source="{Binding doctorImage}" Margin="10"/>
+                <TextBlock Text="{Binding doctorName}" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="5"/>
+                <TextBlock Text="{Binding FormattedLoginDate}" FontSize="15" Foreground="Gray" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="15,0,10,0"/>
+                <Button BorderThickness="0" Content="wróć" Click="Back_Click" FontSize="17" Margin="10" HorizontalAlignment="Right" Foreground="White" >
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="Background" Value="#5C84E2"/>
@@ -44,7 +43,7 @@
                 </Button.Template>
             </Button>
         </DockPanel>
-
+        </Border>
         <ScrollViewer Grid.Row="1">
             <ItemsControl x:Name="MessagesList" Margin="10" ItemsSource="{Binding Messages}">
                 <ItemsControl.ItemTemplate>
