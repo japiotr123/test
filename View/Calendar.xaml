@@ -9,8 +9,53 @@
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
     xml:lang="pl-PL"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance local:CalendarModel ,IsDesignTimeCreatable=True}"
-             >
+    d:DataContext="{d:DesignInstance local:CalendarModel ,IsDesignTimeCreatable=True}">
+    <StackPanel>
+        <UniformGrid Margin="36,18,47,18" HorizontalAlignment="Center" Columns="3">
+            <Button Background="White"  Click="CalendarPrevious" >
+                <fa:ImageAwesome Icon="ArrowLeft" Margin="7" Width="20"/>
+            </Button>
+            <Border BorderThickness="0.5" BorderBrush="Black">
+                <TextBlock  d:Text="{Binding year}" x:Name="rok" Margin="6" FontSize="24" FontWeight="Bold"/>
+            </Border>
+            <Button Background="White" Click="CalendarNext" >
+                <fa:ImageAwesome Icon="ArrowRight" Margin="7" Width="20"/>
+            </Button>
+        </UniformGrid>
+
+        <ItemsControl x:Name="monthGrid" d:ItemsSource="{Binding Months}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="3" Columns="4"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}"
+                          DisplayDateStart="{Binding .}"
+                          DisplayMode="Month" 
+                          Loaded="Calendar_Loaded"
+                          SelectedDatesChanged="Calendar_SelectionChanged"
+                          Margin="20"
+                          BorderThickness="0" RenderTransformOrigin="0.5,0.5" FontSize="24">
+
+                        <Calendar.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Calendar.RenderTransform>
+                    </Calendar>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+
+
+
+    <!-- style kalendarza -->
     <UserControl.Resources>
         <Style x:Key="CalendarCalendarItemStyle1" TargetType="{x:Type CalendarItem}">
             <Setter Property="Margin" Value="0,3,0,3"/>
@@ -37,14 +82,14 @@
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
                                     <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
-                                                      Content="{Binding DisplayDate,
-                                                      RelativeSource={RelativeSource AncestorType=Calendar}}"
-                                                      ContentStringFormat="{}{0:MMMM}"
-                                                      TextElement.Foreground="#FF333333"
-                                                      TextElement.FontFamily="DejaVu Sans"                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                      Margin="1,4,1,9"
-                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                      />
+                                                  Content="{Binding DisplayDate,
+                                                  RelativeSource={RelativeSource AncestorType=Calendar}}"
+                                                  ContentStringFormat="{}{0:MMMM}"
+                                                  TextElement.Foreground="#FF333333"
+                                                  TextElement.FontFamily="DejaVu Sans"                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  Margin="1,4,1,9"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  />
                                 </Grid>
                             </ControlTemplate>
 
@@ -119,46 +164,4 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel Background="White">
-        <UniformGrid Margin="36,18,47,18" HorizontalAlignment="Center" Columns="3">
-            <Button Background="White"  Click="CalendarPrevious" >
-                <fa:ImageAwesome Icon="ArrowLeft" Margin="7" Width="20"/>
-            </Button>
-            <Border BorderThickness="0.5" BorderBrush="Black">
-                <TextBlock  d:Text="{Binding year}" x:Name="rok" Margin="6" FontSize="24" FontWeight="Bold"/>
-            </Border>
-            <Button Background="White" Click="CalendarNext" >
-                <fa:ImageAwesome Icon="ArrowRight" Margin="7" Width="20"/>
-            </Button>
-        </UniformGrid>
-        <ItemsControl x:Name="monthGrid"  d:ItemsSource="{Binding Months}">
-            <ItemsControl.ItemsPanel>
-
-                <ItemsPanelTemplate>
-                    <UniformGrid Rows="3" Columns="4"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}"
-                          DisplayDateStart="{Binding .}"
-                          DisplayMode="Month" 
-                          Loaded="Calendar_Loaded"
-                          Margin="20"
-                          KeyboardNavigation.DirectionalNavigation="None"
-                          BorderThickness="0" RenderTransformOrigin="0.5,0.5" FontSize="24">
-
-                        <Calendar.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform ScaleX="1.25" ScaleY="1.25"/>
-                                <SkewTransform/>
-                                <RotateTransform/>
-                                <TranslateTransform/>
-                            </TransformGroup>
-                        </Calendar.RenderTransform>
-                    </Calendar>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </StackPanel>
 </UserControl>
