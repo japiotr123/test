@@ -45,9 +45,10 @@ namespace PolMedUMG.View
                 {
                     conn.Open();
                     PlannedVisits = new ObservableCollection<Model.Visit>();
-                    string sql = "SELECT `causeOfVisit`, `additionalInfo`, `phoneNumber`, `dateOfVisit`, `serviceName`  FROM `Visits`";
+                    string sql = "SELECT `causeOfVisit`, `additionalInfo`, `phoneNumber`, `dateOfVisit`, `serviceName` FROM `Visits` WHERE `patient_id` = @patientId";
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
+                        cmd.Parameters.AddWithValue("@patientId", SessionManager.CurrentUsername);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
