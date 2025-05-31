@@ -10,9 +10,9 @@ namespace PolMedUMG.View
     public class Visit
     {
         public DateTime Date { get; set; }
-        public string Doctor { get; set; }       // Zawiera specialistID jako tekst
-        public string Description { get; set; }  // Zawiera serviceName
-        public string TestType { get; set; }  // Zawiera additionalInfo
+        public string Doctor { get; set; }       // specialistID jako tekst
+        public string Description { get; set; }  // details
+        public string TestType { get; set; }     // serviceName
 
         public string FormattedDate => Date.ToString("dd.MM.yyyy");
     }
@@ -27,7 +27,6 @@ namespace PolMedUMG.View
         public Visits()
         {
             InitializeComponent();
-
             allVisits = new List<Visit>();
 
             using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
@@ -35,26 +34,35 @@ namespace PolMedUMG.View
                 try
                 {
                     conn.Open();
-                    string sql = "SELECT dateOfVisit, serviceName, details, specialistID FROM Visits;";
+
+                    string sql = @"
+                        SELECT dateOfVisit, serviceName, details, specialistID 
+                        FROM Visits 
+                        WHERE patient_id = @uid;";
 
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
+                        cmd.Parameters.AddWithValue("@uid", SessionManager.CurrentUsername);
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            allVisits.Add(new Visit
+                            while (reader.Read())
                             {
-                                Date = Convert.ToDateTime(reader["dateOfVisit"]),
-                                Doctor = reader["specialistID"].ToString(), // Zawiera specialistID jako tekst
-                                TestType = reader["serviceName"].ToString(),
-                                Description = reader["details"].ToString(),
-                            });
+                                allVisits.Add(new Visit
+                                {
+                                    Date = Convert.ToDateTime(reader["dateOfVisit"]),
+                                    Doctor = reader["specialistID"].ToString(),
+                                    TestType = reader["serviceName"].ToString(),
+                                    Description = reader["details"].ToString()
+                                });
+                            }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Błąd bazy danych: " + ex.Message);
+                    return;
                 }
             }
 

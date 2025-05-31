@@ -10,12 +10,11 @@ namespace PolMedUMG.View
     public class Result
     {
         public DateTime Date { get; set; }
-        public string TestType { get; set; } // np. Morfologia krwi
-        public string Status { get; set; }   // np. odczytane / nieodczytane
-        public string Description { get; set; } // np. szczegóły badania
+        public string TestType { get; set; }
+        public string Status { get; set; }
+        public string Description { get; set; }
 
         public bool IsRead => Status == "odczytane";
-
         public string FormattedDate => Date.ToString("dd.MM.yyyy");
     }
 
@@ -37,20 +36,28 @@ namespace PolMedUMG.View
                 try
                 {
                     conn.Open();
-                    string sql = "SELECT dateOfVisit, serviceName, additionalInfo, status FROM Visits;";
+
+                    string sql = @"
+                        SELECT dateOfVisit, serviceName, additionalInfo, status 
+                        FROM Visits 
+                        WHERE patient_id = @uid;";
 
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        while (reader.Read())
+                        cmd.Parameters.AddWithValue("@uid", SessionManager.CurrentUsername);
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            allResults.Add(new Result
+                            while (reader.Read())
                             {
-                                Date = Convert.ToDateTime(reader["dateOfVisit"]),
-                                TestType = reader["serviceName"].ToString(),
-                                Description = reader["additionalInfo"].ToString(),
-                                Status = reader["status"].ToString()
-                            });
+                                allResults.Add(new Result
+                                {
+                                    Date = Convert.ToDateTime(reader["dateOfVisit"]),
+                                    TestType = reader["serviceName"].ToString(),
+                                    Description = reader["additionalInfo"].ToString(),
+                                    Status = reader["status"].ToString()
+                                });
+                            }
                         }
                     }
                 }
@@ -106,12 +113,19 @@ namespace PolMedUMG.View
                         try
                         {
                             conn.Open();
-                            string sql = "UPDATE Visits SET status = 'odczytane' WHERE dateOfVisit = @date AND serviceName = @type";
+
+                            string sql = @"
+                                UPDATE Visits 
+                                SET status = 'odczytane' 
+                                WHERE dateOfVisit = @date 
+                                  AND serviceName = @type 
+                                  AND patient_id = @uid;";
 
                             using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                             {
                                 cmd.Parameters.AddWithValue("@date", selectedResult.Date.ToString("yyyy-MM-dd"));
                                 cmd.Parameters.AddWithValue("@type", selectedResult.TestType);
+                                cmd.Parameters.AddWithValue("@uid", SessionManager.CurrentUsername);
                                 cmd.ExecuteNonQuery();
                             }
 
