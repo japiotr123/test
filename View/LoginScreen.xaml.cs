@@ -23,8 +23,8 @@ namespace PolMedUMG.View
     {
         public LoginScreen()
         {
+            SessionManager.connStrSQL = "server=bb97fob4mmaybcvttjjk-mysql.services.clever-cloud.com;uid=uirqsom4re7q6gwn;pwd=ODh2O0u6eNj3uUkXsLYO;database=bb97fob4mmaybcvttjjk";
             InitializeComponent();
-            DataContext = new LoginViewModel();
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -47,23 +47,13 @@ namespace PolMedUMG.View
             if (WindowState != WindowState.Maximized) WindowState = WindowState.Maximized;
             else WindowState = WindowState.Normal;
         }
-
-        private void btnLog_In(object sender, RoutedEventArgs e)
+        public void LoadContent(UserControl control)
         {
-            if (DataContext is LoginViewModel vm)
+            if (Content != null)
             {
-                vm.Password = passwordInput.Password;
+                Content.Children.Clear();
+                Content.Children.Add(control);
             }
-        }
-
-        private void btn_pass_reset(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btn_acc_create(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

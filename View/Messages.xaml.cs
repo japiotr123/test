@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FontAwesome.WPF;
 using System.Windows.Data;
+using MySql.Data.MySqlClient;
 
 namespace PolMedUMG.View
 {
@@ -64,12 +65,57 @@ namespace PolMedUMG.View
                 LoadCurrentPage();
             }
         }
+        public DateTime GetLastLogin(string receiver)
+        {
+            using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
+            {
+                try
+                {
+                    conn.Open();
+
+                    // Krok 1: Pobierz username (login) na podstawie receivera
+                    string getUsernameSql = @"SELECT uid FROM users WHERE CONCAT('dr. ', firstName, ' ', secondName) = @receiver LIMIT 1";
+
+                    string username = null;
+
+                    using (MySqlCommand cmd = new MySqlCommand(getUsernameSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@receiver", receiver);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null)
+                            username = result.ToString();
+                    }
+
+                    // Jeśli nie znaleziono loginu – wyjście
+                    if (string.IsNullOrEmpty(username))
+                        return DateTime.Now;
+
+                    // Krok 2: Pobierz datę ostatniego logowania dla znalezionego username
+                    string getLoginSql = "SELECT last_login FROM users WHERE uid = @username LIMIT 1";
+
+                    using (MySqlCommand cmd = new MySqlCommand(getLoginSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@username", username);
+                        object result = cmd.ExecuteScalar();
+
+                        if (result != null && DateTime.TryParse(result.ToString(), out DateTime lastLogin))
+                            return lastLogin;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Błąd przy pobieraniu daty logowania: " + ex.Message);
+                }
+            }
+
+            return DateTime.Now;
+        }
         private void ConversationList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ConversationList.SelectedItem is ConvMessages selectedConversation)
             {
                 var Conv = new MessagesOpenConv(
-                    selectedConversation.Date,
+                    GetLastLogin(selectedConversation.Sender),
                     selectedConversation.Sender,
                     selectedConversation.DoctorImage,
                     selectedConversation

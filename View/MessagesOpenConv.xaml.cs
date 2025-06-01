@@ -33,6 +33,36 @@ namespace PolMedUMG.View
 
             this.DataContext = this;
         }
+        public string FormattedLoginDate
+        {
+            get
+            {
+                TimeSpan diff = DateTime.Now - date;
+                if (diff.TotalMinutes < 60)
+                {
+                    int minutes = (int)diff.TotalMinutes;
+                    return $"Ostatnia aktywność: {date:dd.MM.yyyy HH:mm} ({minutes} minut temu)";
+                }
+                else if (diff.TotalHours == 1)
+                {
+                    return $"Ostatnia aktywność: {date:dd.MM.yyyy HH:mm} (jedną godzinę temu)";
+                }
+                else if (diff.TotalHours < 24)
+                {
+                    int hours = (int)diff.TotalHours;
+                    return $"Ostatnia aktywność: {date:dd.MM.yyyy HH:mm} ({hours} godzin temu)";
+                }
+                else if (diff.TotalDays < 2)
+                {
+                    return $"Ostatnia aktywność: {date:dd.MM.yyyy HH:mm} (jeden dzień temu)";
+                }
+                else
+                {
+                    int days = (int)diff.TotalDays;
+                    return $"Ostatnia aktywność: {date:dd.MM.yyyy HH:mm} ({days} dni temu)";
+                }
+            }
+        }
         private void Back_Click(object sender, RoutedEventArgs e)
         {
             if (MainArea != null)
@@ -66,7 +96,7 @@ namespace PolMedUMG.View
                         conn.Open();
 
                         string sql = @"INSERT INTO Conversations (sender, receiver, date, content, status, doctorImage, statusPatient) 
-                           VALUES (@sender, @receiver, @date, @content, @status, @doctorImage, @statusPatient);";
+                        VALUES (@sender, @receiver, @date, @content, @status, @doctorImage, @statusPatient);";
 
                         using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                         {
@@ -90,9 +120,10 @@ namespace PolMedUMG.View
             }
             else
             {
-                MessageBox.Show("Wiadomość jest pusta!");
+                
             }
         }
+        
         public static bool compare(object value)
         {
             string sender = value as string;
