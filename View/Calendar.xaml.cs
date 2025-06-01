@@ -31,6 +31,7 @@ namespace PolMedUMG.View
         }
         public Calendar()
         {
+            PlannedVisits = new ObservableCollection<Model.Visit>();
             InitializeComponent();
             year = DateTime.Now.Year;
             getVisits();
@@ -44,7 +45,6 @@ namespace PolMedUMG.View
                 try
                 {
                     conn.Open();
-                    PlannedVisits = new ObservableCollection<Model.Visit>();
                     string sql = "SELECT `causeOfVisit`, `additionalInfo`, `phoneNumber`, `dateOfVisit`, `serviceName` FROM `Visits` WHERE `patient_id` = @patientId";
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
@@ -94,16 +94,19 @@ namespace PolMedUMG.View
         {
             // pozbycie się dni spoza danego miesiąca
             var calendar = (System.Windows.Controls.Calendar)sender;
-            DateTime begin = (DateTime)calendar.DisplayDateStart;
-            calendar.DisplayDateEnd = begin.AddDays(DateTime.DaysInMonth(begin.Year, begin.Month) - 1);
+            calendar.Visibility = Visibility.Visible;
 
+            DateTime? begin = calendar.DisplayDateStart;
+            if (begin.HasValue)
+            {
+                calendar.DisplayDateEnd = begin.Value.AddDays(DateTime.DaysInMonth(begin.Value.Year, begin.Value.Month) - 1);
+            }
             // zaznaczenie dni wizyt w kalendarzu
             if (PlannedVisits != null)
             {
                 var visits = await Task.Run(() =>
                     PlannedVisits.Select(v => v.DateOfVisit).Distinct().ToList()
                 );
-
                 foreach (var d in visits)
                 {
                     if (calendar.DisplayDate.Month == d.Month)
