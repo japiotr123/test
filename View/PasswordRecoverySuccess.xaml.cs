@@ -8,9 +8,14 @@ namespace PolMedUMG.View
     {
         private string _email;
 
-        public PasswordRecoverySuccess()
+        public PasswordRecoverySuccess(string email)
         {
             InitializeComponent();
+
+            _email = email;
+
+            InfoTextBlock.Text = $"Na adres {email} wysłaliśmy wiadomość, która udostępniła nowe, tymczasowe hasło ważne przez 15 minut.";
+
         }
         private void go_Back(object sender, RoutedEventArgs e)
         {
@@ -23,9 +28,9 @@ namespace PolMedUMG.View
                 parentWindow.LoadContent(Conv);
             }
         }
-        private void resend_password(object sender, RoutedEventArgs e)
+        public void resend_password(object sender, RoutedEventArgs e)
         {
-            //tu pewnie będzie odwołanie do metody która wysyła hasło
+            PasswordRecovery.SendNewPassword(_email);
         }
     }
 }

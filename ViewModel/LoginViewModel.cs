@@ -11,6 +11,7 @@ using System.Data;
 using MySqlX.XDevAPI;
 using System.Data.Common;
 using System.Reflection.PortableExecutable;
+using System.Diagnostics;
 
 namespace PolMedUMG.ViewModel
 {
@@ -18,6 +19,8 @@ namespace PolMedUMG.ViewModel
     {
         private string _username;
         private string _password;
+
+        private LoginPrompt _view;
 
         public string Username
         {
@@ -33,9 +36,21 @@ namespace PolMedUMG.ViewModel
 
         public ICommand LoginCommand { get; }
 
-        public LoginViewModel()
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                _errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+            }
+        }
+
+        public LoginViewModel(LoginPrompt view)
         {
             LoginCommand = new RelayCommand(Login);
+            _view = view;
         }
 
         private void Login()
@@ -98,9 +113,13 @@ namespace PolMedUMG.ViewModel
                             }
                         }
                         TimeSpan timeSinceGeneration = DateTime.Now - dateOfGeneration;
+                        if (_password == recoveryPassword && timeSinceGeneration.TotalMinutes <= 15)
+                        {
+                            Debug.WriteLine("działa fantastycznie");
+                        }
 
                         if (password == _password || (_password == recoveryPassword && timeSinceGeneration.TotalMinutes <= 15)) 
-                        { // dodac stosowna informacje ze haslo wygaslo, usunac z bazy niepotrzebne hasla
+                        {
                             MySqlCommand updateLoginTime = new MySqlCommand();
                             updateLoginTime.Connection = conn;
                             updateLoginTime.CommandText = @"UPDATE users SET last_login = @loginTime WHERE uid = @uid;";
@@ -108,7 +127,25 @@ namespace PolMedUMG.ViewModel
                             updateLoginTime.Parameters.AddWithValue("@uid", _username);
                             updateLoginTime.ExecuteNonQuery();
 
-                            
+                            if (_password == recoveryPassword && timeSinceGeneration.TotalMinutes <= 15)
+                            {
+                                MySqlCommand deleteRecoveryPasswords = new MySqlCommand();
+                                deleteRecoveryPasswords.Connection = conn;
+                                deleteRecoveryPasswords.CommandText = @"DELETE FROM PassRecovery WHERE username = @uid;";
+                                deleteRecoveryPasswords.Parameters.AddWithValue("@uid", _username);
+                                deleteRecoveryPasswords.ExecuteNonQuery();
+
+                                MySqlCommand updatePassword = new MySqlCommand();
+                                updatePassword.Connection = conn;
+                                updatePassword.CommandText = @"UPDATE users SET pwd = @newPassword WHERE uid = @uid;";
+                                updatePassword.Parameters.AddWithValue("@newPassword", _password);
+                                updatePassword.Parameters.AddWithValue("@uid", _username);
+                                updatePassword.ExecuteNonQuery();
+
+                                MessageBox.Show("Twoje domyślne hasło zostało zmienione!");
+                            }
+
+
                             // W zaleznosci od typu uzytkownika otwieramy odpowiednie okno
                             if (acctype.Equals("2"))
                             {
@@ -129,7 +166,19 @@ namespace PolMedUMG.ViewModel
                         }
                         else
                         {
-                            MessageBox.Show("Cos poszlo nie tak");
+                            if (_password == recoveryPassword && timeSinceGeneration.TotalMinutes > 15) // przedawnione haslo
+                            {
+                                ErrorMessage = "Hasło przywracające uległo przedawnieniu";
+                                MySqlCommand deleteRecoveryPasswords = new MySqlCommand();
+                                deleteRecoveryPasswords.Connection = conn;
+                                deleteRecoveryPasswords.CommandText = @"DELETE FROM PassRecovery WHERE username = @uid;";
+                                deleteRecoveryPasswords.Parameters.AddWithValue("@uid", _username);
+                                deleteRecoveryPasswords.ExecuteNonQuery();
+                            }
+                            if(_password != password)
+                            {
+                                ErrorMessage = "Podano złe hasło.";
+                            }
                         }
                             conn.Close();
                     }
@@ -140,7 +189,7 @@ namespace PolMedUMG.ViewModel
                 }
                 else
                 {
-                    MessageBox.Show("Niepoprawny login lub haslo");
+                    ErrorMessage = "Zły login bądź hasło";
                 }
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)

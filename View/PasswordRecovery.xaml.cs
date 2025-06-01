@@ -35,7 +35,7 @@ namespace PolMedUMG.View
             {
                 SendNewPassword(enteredEmail);
 
-                var Conv = new PasswordRecoverySuccess();
+                var Conv = new PasswordRecoverySuccess(enteredEmail);
 
                 var parentWindow = Window.GetWindow(this) as LoginScreen;
 
@@ -50,7 +50,7 @@ namespace PolMedUMG.View
             }
         }
 
-        private void SendNewPassword(string toEmail)
+        public static void SendNewPassword(string toEmail)
         {
             string generatedPassword = PasswordGenerator();
 
@@ -67,9 +67,7 @@ namespace PolMedUMG.View
             <p>Wygenerowaliśmy dla Ciebie tymczasowe hasło, które umożliwi Ci zalogowanie się do aplikacji.</p>
             <p>Po pomyślnym logowaniu hasło to stanie się Twoim nowym hasłem. Pamiętaj, aby jak najszybciej zmienić je w ustawieniach konta.</p>
             <p><strong>Nowe hasło (ważne przez 15 minut):</strong></p>
-            <div style='background-color: #f4f4f4; padding: 10px; border-radius: 5px; display: inline-block; font-size: 18px;'>
-            {generatedPassword}
-            </div>
+            <div style='background-color: #f4f4f4; padding: 10px; border-radius: 5px; display: inline-block; font-size: 18px;'>{generatedPassword.Trim()}</div>
             <p style='margin-top: 20px;'>Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość.</p>
             <br/>
             <p>Pozdrawiamy,<br/><strong>PolMed-UMG</strong></p>
@@ -99,14 +97,14 @@ namespace PolMedUMG.View
                 }
             }
         }
-        private string PasswordGenerator()
+        public static string PasswordGenerator()
         {
             const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*";
             Random rnd = new Random();
             return new string(Enumerable.Repeat(valid, 15)
                 .Select(s => s[rnd.Next(s.Length)]).ToArray());
         }
-        private void SendInfoToDB(string email, string newPass, DateTime dateOfGeneration)
+        public static void SendInfoToDB(string email, string newPass, DateTime dateOfGeneration)
         {
             using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
             {

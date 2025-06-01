@@ -6,6 +6,7 @@
              Height="Auto" Width="Auto">
 
     <Border CornerRadius="25" Width="750" Height="400" Background="Gray" Margin="0,60,0,0">
+        
         <StackPanel >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,100,0,0" >
                 <Border Width="60" Height="60" CornerRadius="30" Background="White">
@@ -24,6 +25,8 @@
 
                     </PasswordBox>
                 </Border>
+                <!--- tu bedzie textblock z bledem -->
+                
             </StackPanel>
 
             <Button x:Name="btnLogIn"

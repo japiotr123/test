@@ -9,6 +9,7 @@ namespace PolMedUMG.View
         public LoginPrompt()
         {
             InitializeComponent();
+            this.DataContext = new LoginViewModel(this);
         }
         private void btnLog_In(object sender, RoutedEventArgs e)
         {
