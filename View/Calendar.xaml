@@ -37,6 +37,7 @@
                           Loaded="Calendar_Loaded"
                           SelectedDatesChanged="Calendar_SelectionChanged"
                           Margin="20"
+                              Visibility="Collapsed"
                           BorderThickness="0" RenderTransformOrigin="0.5,0.5" FontSize="24">
 
                         <Calendar.RenderTransform>
