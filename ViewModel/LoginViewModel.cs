@@ -166,6 +166,10 @@ namespace PolMedUMG.ViewModel
                         }
                         else
                         {
+                            if (_password != password)
+                            {
+                                ErrorMessage = "Podano złe hasło.";
+                            }
                             if (_password == recoveryPassword && timeSinceGeneration.TotalMinutes > 15) // przedawnione haslo
                             {
                                 ErrorMessage = "Hasło przywracające uległo przedawnieniu";
@@ -174,10 +178,6 @@ namespace PolMedUMG.ViewModel
                                 deleteRecoveryPasswords.CommandText = @"DELETE FROM PassRecovery WHERE username = @uid;";
                                 deleteRecoveryPasswords.Parameters.AddWithValue("@uid", _username);
                                 deleteRecoveryPasswords.ExecuteNonQuery();
-                            }
-                            if(_password != password)
-                            {
-                                ErrorMessage = "Podano złe hasło.";
                             }
                         }
                             conn.Close();

@@ -4,6 +4,7 @@ using PolMedUMG.ViewModel;
 using System.Net;
 using System.Net.Mail;
 using MySql.Data.MySqlClient;
+using System.ComponentModel;
 
 namespace PolMedUMG.View
 {
@@ -46,7 +47,7 @@ namespace PolMedUMG.View
             }
             else{
 
-                MessageBox.Show($"Podano zly adres e-mail.");
+                errorTextBlock.Text = "Podano zły adres e-mail";
             }
         }
 
@@ -126,7 +127,6 @@ namespace PolMedUMG.View
                         }
                         else
                         {
-                            MessageBox.Show("Nie znaleziono użytkownika o podanym adresie email.");
                             return;
                         }
                     }
