@@ -28,3 +28,21 @@ jobs:
 
     - name: Run tests
       run: dotnet test --no-build --verbosity normal
+
+    - name: Spakuj build
+      run: |
+       mkdir publish
+       cp -r ./bin//Release/net9.0-windows/* ./publish/
+       cd publish
+       7z a ../app.zip *
+       cd ..
+
+    - name: upload windows artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./app.zip
+          asset_name: PolMedUmg-Release.zip
+          asset_content_type: application/zip
