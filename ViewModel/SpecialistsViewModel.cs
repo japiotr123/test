@@ -2,12 +2,8 @@
 using MySql.Data.MySqlClient;
 using PolMedUMG.Model;
 using PolMedUMG.View;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
 
 namespace PolMedUMG.ViewModel
@@ -25,6 +21,7 @@ namespace PolMedUMG.ViewModel
             this.secondName = secondName;
         }
     }
+
     public class SpecialistsViewModel
     {
         public ObservableCollection<Specialist> Specialists { get; set; }
@@ -35,7 +32,6 @@ namespace PolMedUMG.ViewModel
         public SpecialistsViewModel()
         {
             Specialists = new ObservableCollection<Specialist>{};
-
 
             using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
             {
@@ -54,14 +50,15 @@ namespace PolMedUMG.ViewModel
                                 reader["secondName"].ToString()
                             );
 
-                            Specialists.Add(new Specialist { Uid = doctor.uid, Icon = "UserMd", Title = "Tytuł", Name = $"dr. {doctor.firstName} {doctor.secondName}" });
+                            Specialists.Add(new Specialist { Uid = doctor.uid, Icon = "UserMd", Title = "Doktor", Name = $"dr. {doctor.firstName} {doctor.secondName}" });
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     // Obsługa błędów
-                    Console.WriteLine("Błąd podczas pobierania danych: " + ex.Message);
+                    MessageBox.Show("Podczas pobierania danych wystapił błąd, spróbuj ponownie później lub skontaktuj się z administratorem", "Wystapił błąd");
+                    Debug.WriteLine("Błąd podczas pobierania danych: " + ex.Message);
                 }
             }
         }

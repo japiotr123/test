@@ -8,12 +8,9 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <!-- Tytuł -->
             <RowDefinition Height="*" />
-            <!-- Kafelki -->
         </Grid.RowDefinitions>
 
-        <!-- Tytuł -->
         <TextBlock Grid.Row="0"
                Text="NASI SPECJALIŚCI"
                FontSize="32"

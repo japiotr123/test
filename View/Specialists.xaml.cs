@@ -1,21 +1,9 @@
 ﻿using PolMedUMG.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using PolMedUMG.Model;            // dla Specialist
-using PolMedUMG.View;             // dla MessagesOpenConv
-using PolMedUMG.View;
-using System.Diagnostics;             // jeżeli MessageRepository jest w tej przestrzeni
+using PolMedUMG.Model;
+using System.Diagnostics;
 
 namespace PolMedUMG.View
 {
@@ -32,11 +20,11 @@ namespace PolMedUMG.View
 
         private void Specialist_Click(object sender, MouseButtonEventArgs e)
         {
-            // 1) Pobierz kliknięty kafelek i model Specialist:
+            // Pobierz kliknięty kafelek i model Specialist:
             if (!(sender is FrameworkElement element && element.DataContext is Specialist spec))
                 return;
 
-            // 2) Załaduj historię rozmów z tego lekarzem:
+            // Załaduj historię rozmów z tego lekarzem:
             var repo = new MessageRepository();
             // GetMessagesFrom zwraca listę ConvMessages posortowaną od najstarszych
             var history = repo
@@ -44,28 +32,36 @@ namespace PolMedUMG.View
                 .OrderBy(m => m.Date)
                 .ToList();
 
-            // 3) Przygotuj parametry do MessagesOpenConv:
-            //    jeśli brak wiadomości - ustaw domyślnie
+            // parametry do MessagesOpenConv: jeśli brak wiadomości - ustaw domyślnie
             var lastMsg = history.LastOrDefault();
             var date = lastMsg?.Date ?? DateTime.Now;
             var img = lastMsg?.DoctorImage ?? "default_doctor.png";
 
-            // 4) Stwórz kontrolkę czatu:
             var chatControl = new MessagesOpenConv(
-                date,               // data ostatniej wiadomości
-                spec.Name,          // imię lekarza ("dr. XX")
-                img,                // obrazek lekarza
-                lastMsg             // ostatnia wiadomość (ConvMessages)
+                date,
+                spec.Name,
+                img,
+                lastMsg
             );
 
-            // 5) Wywołaj metodę LoadContent w głównym oknie (PatientScreen):
             var parentWindow = Window.GetWindow(this) as PatientScreen;
             if (parentWindow != null)
             {
+                // Zmiana zaznaczenia opcji w menu przed przeniesieniem do widoku czatu
+                foreach (ListBoxItem item in parentWindow.NavList.Items)
+                {
+                    if (item.Content.ToString() == "Wiadomości")
+                    {
+                        parentWindow.NavList.SelectedItem = item;
+                        break;
+                    }
+                }
+
                 parentWindow.LoadContent(chatControl);
             }
             else
             {
+                MessageBox.Show("Nie można załadować czatu, spróbuj ponownie później lub skontaktuj się z administratorem", "Wystapił błąd");
                 Debug.WriteLine("Nie znaleziono PatientScreen, nie można załadować czatu.");
             }
         }
