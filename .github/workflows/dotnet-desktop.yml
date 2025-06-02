@@ -51,6 +51,8 @@ jobs:
       if: startsWith(github.ref, 'refs/heads/release/')
       uses: softprops/action-gh-release@v2
       with:
-       files: app.zip
+        name: v${{ env.GitVersion_SemVer }}
+        prerelease: ${{ env.GitVersion_PreReleaseLabel != '' }}
+        files: app.zip
       env:
        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
