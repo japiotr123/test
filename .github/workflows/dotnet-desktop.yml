@@ -42,6 +42,7 @@ jobs:
         tag_name: v${{ github.sha }}
         name: Release ${{ github.sha }}
         files: PolMedUMG-release.zip
+        prerelease: true
       env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
