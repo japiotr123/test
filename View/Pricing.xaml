@@ -16,7 +16,7 @@
            FontWeight="Bold"
            HorizontalAlignment="Center"
            Margin="0,20,0,20"/>
-        <ListView IsHitTestVisible="False" x:Name="priceGrid" ItemsSource="{Binding prices}" Margin="0,0,0,10"  Height="500" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Yu Gothic UI Semibold" FontSize="18">
+        <ListView x:Name="priceGrid" ItemsSource="{Binding prices}" Margin="0,0,0,10"  Height="500" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Yu Gothic UI Semibold" FontSize="18">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="FontFamily" Value="Verdana Pro Cond Semibold"/>

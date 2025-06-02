@@ -11,7 +11,10 @@ namespace PolMedUMG.ViewModel
         public PricingViewModel()
         {
             prices = [new Model.Prices { Service_name = "Ładowanie...", Price = "..." }];
-            ;
+        }
+
+        public void LoadData()
+        {
             using (MySqlConnection conn = new MySqlConnection(SessionManager.connStrSQL))
             {
                 try
@@ -33,14 +36,13 @@ namespace PolMedUMG.ViewModel
                             }
                         }
                     }
+                    conn.Close();
                 }
                 catch (Exception ex)
                 {
-                    // Obsługa błędów
                     MessageBox.Show("Błąd podczas pobierania danych: " + ex.Message);
                 }
             }
-
         }
 
     }

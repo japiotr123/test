@@ -15,8 +15,10 @@ namespace PolMedUMG.View
         public Pricing()
         {
             InitializeComponent();
-            DataContext = new PricingViewModel  ();
 
+            var vm = new PricingViewModel();
+            vm.LoadData();
+            this.DataContext = vm;
         }
     }
 }
