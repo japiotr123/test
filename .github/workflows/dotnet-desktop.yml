@@ -41,16 +41,7 @@ jobs:
       with:
         tag_name: v${{ github.run_number }}
         name: Release ${{ github.run_number }}
-      env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Tag
-      run: |
-        git tag "v$env:GitVersion_SemVer"
-    - name: Dołącz build do release
-      uses: softprops/action-gh-release@v2
-      with:
-        name: v${{ env.GitVersion_SemVer }}
-        prerelease: ${{ env.GitVersion_PreReleaseLabel != '' }}
         files: app.zip
       env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
