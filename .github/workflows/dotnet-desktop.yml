@@ -43,13 +43,12 @@ jobs:
         name: Release ${{ github.run_number }}
       env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Utwórz tag (jeśli nie istnieje)
+    - name: Tag
+      if: startsWith(github.ref, 'refs/heads/release/')
       run: |
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git tag v${{ github.run_number }}
-        git push origin v${{ github.run_number }}
+        git tag "v$env:GitVersion_SemVer"
     - name: Dołącz build do release
+      if: startsWith(github.ref, 'refs/heads/release/')
       uses: softprops/action-gh-release@v2
       with:
        files: app.zip
