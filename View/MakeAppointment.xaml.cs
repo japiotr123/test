@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1;
 
 namespace PolMedUMG.View
 {
@@ -10,7 +12,8 @@ namespace PolMedUMG.View
     {
         private TimeSpan currentTime = new TimeSpan(18, 0, 0); // Domyślna godzina 18:00
         private DateTime currentMonth = DateTime.Today;
-        private Button selectedDayButton = null; // Dla podświetlenia wybranej daty
+        private Button selectedDayButton = null;
+        private DateTime? selectedDate = null;
 
         public MakeAppointment()
         {
@@ -22,26 +25,62 @@ namespace PolMedUMG.View
 
         private void InitializeForm()
         {
-            DoctorComboBox.ItemsSource = new List<string>
-            {
-                "Dr Anna Kowalska – Kardiolog",
-                "Dr Jan Nowak – Internista",
-                "Dr Marta Wiśniewska – Pediatra",
-                "Dr Piotr Zieliński – Dermatolog"
-            };
-            DoctorComboBox.Text = "Wybierz specjalistę";
-
-            ServiceComboBox.ItemsSource = new List<string>
-            {
-                "Konsultacja specjalistyczna",
-                "Badania kontrolne",
-                "Szczepienie",
-                "Wizyta domowa"
-            };
-            ServiceComboBox.Text = "Wybierz usługę";
+            LoadDoctorsFromDatabase();
+            LoadServicesFromDatabase();
         }
 
-        // KALENDARZ
+        private void LoadDoctorsFromDatabase()
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(SessionManager.connStrSQL))
+                {
+                    conn.Open();
+                    string sql = "SELECT uid FROM users WHERE acc_type = 1";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var doctors = new List<dynamic>();
+                        while (reader.Read())
+                        {                         
+                            doctors.Add(reader["uid"].ToString());
+                        }
+                        DoctorComboBox.ItemsSource = doctors;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas ładowania lekarzy: " + ex.Message);
+            }
+        }
+
+        private void LoadServicesFromDatabase()
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(SessionManager.connStrSQL))
+                {
+                    conn.Open();
+                    string sql = "SELECT name FROM Services";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var services = new List<string>();
+                        while (reader.Read())
+                        {
+                            services.Add(reader["name"].ToString());
+                        }
+                        ServiceComboBox.ItemsSource = services;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas ładowania usług: " + ex.Message);
+            }
+        }
+
         private void LoadCalendar()
         {
             MonthLabel.Text = currentMonth.ToString("MMMM yyyy");
@@ -98,8 +137,11 @@ namespace PolMedUMG.View
                 }
 
                 selectedDayButton = btn;
-                selectedDayButton.Background = new SolidColorBrush(Color.FromRgb(74, 108, 247)); // Niebieskie tło
+                selectedDayButton.Background = new SolidColorBrush(Color.FromRgb(74, 108, 247));
                 selectedDayButton.Foreground = Brushes.White;
+
+                int selectedDay = int.Parse(btn.Content.ToString());
+                selectedDate = new DateTime(currentMonth.Year, currentMonth.Month, selectedDay);
             }
         }
 
@@ -115,7 +157,6 @@ namespace PolMedUMG.View
             LoadCalendar();
         }
 
-        // GODZINA
         private void UpdateTimeDisplay()
         {
             TimeDisplay.Text = $"{currentTime.Hours:D2}:{currentTime.Minutes:D2}";
@@ -123,7 +164,7 @@ namespace PolMedUMG.View
 
         private void IncreaseTime_Click(object sender, RoutedEventArgs e)
         {
-            currentTime = currentTime.Add(new TimeSpan(0, 30, 0));
+            currentTime = currentTime.Add(new TimeSpan(0, 15, 0));
             if (currentTime.TotalHours >= 24)
                 currentTime = TimeSpan.Zero;
             UpdateTimeDisplay();
@@ -131,13 +172,12 @@ namespace PolMedUMG.View
 
         private void DecreaseTime_Click(object sender, RoutedEventArgs e)
         {
-            currentTime = currentTime.Subtract(new TimeSpan(0, 30, 0));
+            currentTime = currentTime.Subtract(new TimeSpan(0, 15, 0));
             if (currentTime.TotalMinutes < 0)
-                currentTime = new TimeSpan(23, 30, 0);
+                currentTime = new TimeSpan(23, 45, 0);
             UpdateTimeDisplay();
         }
 
-        // PLACEHOLDER HANDLING
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox tb && (tb.Text == "Wpisz powód wizyty" || tb.Text == "Wpisz dodatkowe uwagi" || tb.Text == "Wpisz swój numer telefonu"))
@@ -167,21 +207,50 @@ namespace PolMedUMG.View
             }
         }
 
-        // WALIDACJA
         private void ScheduleButton_Click(object sender, RoutedEventArgs e)
         {
-            if (DoctorComboBox.Text == "Wybierz specjalistę" ||
-                ServiceComboBox.Text == "Wybierz usługę" ||
+            if (DoctorComboBox.SelectedValue == null ||
+                ServiceComboBox.SelectedItem == null ||
                 string.IsNullOrWhiteSpace(PurposeTextBox.Text) ||
                 string.IsNullOrWhiteSpace(PhoneTextBox.Text) ||
                 PurposeTextBox.Text == "Wpisz powód wizyty" ||
-                PhoneTextBox.Text == "Wpisz swój numer telefonu")
+                PhoneTextBox.Text == "Wpisz swój numer telefonu" ||
+                selectedDate == null)
             {
                 MessageBox.Show("Proszę uzupełnić wszystkie wymagane pola.", "Błąd walidacji", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            MessageBox.Show("Twoje zgłoszenie zostało wysłane!");
+            try
+            {
+                using (var conn = new MySqlConnection(SessionManager.connStrSQL))
+                {
+                    conn.Open();
+                    string sql = @"INSERT INTO Visits (specialistID, causeOfVisit, additionalInfo, phoneNumber, dateOfVisit, serviceName, status, patient_id, details)
+                                   VALUES (@doctor, @cause, @info, @phone, @date, @service, @status, @patient, @details)";
+
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@doctor", DoctorComboBox.SelectedValue.ToString());
+                        cmd.Parameters.AddWithValue("@cause", PurposeTextBox.Text);
+                        cmd.Parameters.AddWithValue("@info", NotesTextBox.Text);
+                        cmd.Parameters.AddWithValue("@phone", PhoneTextBox.Text);
+                        cmd.Parameters.AddWithValue("@date", selectedDate.Value.Date + currentTime);
+                        cmd.Parameters.AddWithValue("@service", ServiceComboBox.SelectedItem.ToString());
+                        cmd.Parameters.AddWithValue("@status", "nieodczytane");
+                        cmd.Parameters.AddWithValue("@patient", "patient");
+                        cmd.Parameters.AddWithValue("@details", "");
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Twoje zgłoszenie zostało zapisane!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd zapisu wizyty: " + ex.Message);
+            }
         }
     }
 }
