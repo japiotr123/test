@@ -4,23 +4,15 @@ using PolMedUMG.ViewModel;
 
 namespace PolMedUMG.View
 {
-    public partial class LoginPrompt : UserControl
+    public partial class AccountCreation : UserControl
     {
-        public LoginPrompt()
+        public AccountCreation()
         {
             InitializeComponent();
-            this.DataContext = new LoginViewModel(this);
         }
-        private void btnLog_In(object sender, RoutedEventArgs e)
+        private void btnPatient(object sender, RoutedEventArgs e)
         {
-            if (DataContext is LoginViewModel vm)
-            {
-                vm.Password = passwordInput.Password;
-            }
-        }
-        private void btn_pass_reset(object sender, RoutedEventArgs e)
-        {
-            var Conv = new PasswordRecovery();
+            var Conv = new PatientAccountCreation();
 
             var parentWindow = Window.GetWindow(this) as LoginScreen;
 
@@ -29,9 +21,13 @@ namespace PolMedUMG.View
                 parentWindow.LoadContent(Conv);
             }
         }
-        private void btn_acc_create(object sender, RoutedEventArgs e)
+        private void btnDoctor(object sender, RoutedEventArgs e)
         {
-            var Conv = new AccountCreation();
+
+        }
+        private void go_Back(object sender, RoutedEventArgs e)
+        {
+            var Conv = new LoginPrompt();
 
             var parentWindow = Window.GetWindow(this) as LoginScreen;
 
